@@ -68,11 +68,20 @@ describe('threshold evaluation', () => {
     expect(selectThreshold(level, config.thresholds)?.max).toBe(expectedMax);
   });
 
-  it('handles explicit mins and gaps deterministically', () => {
+  it('uses a matching catch-all threshold for gaps', () => {
     const thresholds = [
       { min: 0, max: 10, color: 'red' },
       { min: 20, max: 40, color: 'orange' },
       { max: 100, color: 'green' },
+    ];
+    expect(selectThreshold(15, thresholds)?.max).toBe(100);
+  });
+
+  it('falls forward to the next upper band when no threshold matches a gap', () => {
+    const thresholds = [
+      { min: 0, max: 10, color: 'red' },
+      { min: 20, max: 40, color: 'orange' },
+      { min: 50, max: 100, color: 'green' },
     ];
     expect(selectThreshold(15, thresholds)?.max).toBe(40);
   });
