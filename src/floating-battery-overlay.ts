@@ -137,7 +137,7 @@ export class FloatingBatteryOverlay extends LitElement {
 
     const animationClasses = this.animationClasses(snapshot);
     const tooltip = this.tooltip(snapshot);
-    const ariaLabel = this.ariaLabel(snapshot);
+    const ariaLabel = this.ariaText(snapshot);
 
     return html`
       <div class="viewport-anchor" style=${styleMap(wrapperStyle)}>
@@ -288,7 +288,7 @@ export class FloatingBatteryOverlay extends LitElement {
     return `${snapshot.name}: ${level}${state}`;
   }
 
-  private ariaLabel(snapshot: BatterySnapshot): string {
+  private ariaText(snapshot: BatterySnapshot): string {
     if (!this.config) return '';
     if (this.config.display.aria_label) return this.config.display.aria_label;
     const level =

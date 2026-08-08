@@ -4,10 +4,10 @@ import type { HomeAssistant } from 'custom-card-helpers';
 
 import { CARD_VERSION } from './defaults';
 import './floating-battery-overlay';
+import type { FloatingBatteryOverlay } from './floating-battery-overlay';
 import { normalizeConfig } from './normalize';
 import type {
   FloatingBatteryCardConfig,
-  FloatingBatteryOverlayElement,
   NormalizedFloatingBatteryCardConfig,
 } from './types';
 import { isEditorContext } from './utils';
@@ -16,7 +16,7 @@ import { isEditorContext } from './utils';
 export class FloatingBatteryCard extends LitElement {
   private config?: NormalizedFloatingBatteryCardConfig;
   private _hass?: HomeAssistant;
-  private overlay?: FloatingBatteryOverlayElement;
+  private overlay?: FloatingBatteryOverlay;
   private sourcePath = window.location.pathname;
 
   public set hass(value: HomeAssistant) {
@@ -114,7 +114,7 @@ export class FloatingBatteryCard extends LitElement {
 
     let created = false;
     if (!this.overlay || !this.overlay.isConnected) {
-      const overlay = document.createElement('floating-battery-overlay') as FloatingBatteryOverlayElement;
+      const overlay = document.createElement('floating-battery-overlay');
       overlay.dataset.floatingBatteryOwner = this.instanceId;
       overlay.sourceHost = this;
       document.body.appendChild(overlay);
@@ -124,7 +124,7 @@ export class FloatingBatteryCard extends LitElement {
     this.overlay.hass = this._hass;
     this.overlay.sourceHost = this;
     if (created || configChanged) this.overlay.setConfig(this.config);
-    (this.overlay as HTMLElement & { active: boolean }).active = window.location.pathname === this.sourcePath;
+    this.overlay.active = window.location.pathname === this.sourcePath;
   }
 
   private removeOverlay(): void {
@@ -134,8 +134,7 @@ export class FloatingBatteryCard extends LitElement {
 
   private readonly onLocationChanged = (): void => {
     if (this.overlay) {
-      (this.overlay as HTMLElement & { active: boolean }).active =
-        window.location.pathname === this.sourcePath;
+      this.overlay.active = window.location.pathname === this.sourcePath;
     }
   };
 
