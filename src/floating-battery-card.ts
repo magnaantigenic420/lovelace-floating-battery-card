@@ -123,8 +123,15 @@ export class FloatingBatteryCard extends LitElement {
     }
     this.overlay.hass = this._hass;
     this.overlay.sourceHost = this;
+    this.syncThemeFont(this.overlay);
     if (created || configChanged) this.overlay.setConfig(this.config);
     this.overlay.active = window.location.pathname === this.sourcePath;
+  }
+
+  private syncThemeFont(overlay: FloatingBatteryOverlay): void {
+    const fontFamily = getComputedStyle(this).fontFamily;
+    if (fontFamily) overlay.style.fontFamily = fontFamily;
+    overlay.style.setProperty('--paper-font-body1_-_font-family', 'initial');
   }
 
   private removeOverlay(): void {
@@ -143,6 +150,7 @@ export class FloatingBatteryCard extends LitElement {
   static override styles = css`
     :host {
       display: contents;
+      --paper-font-body1_-_font-family: initial;
     }
     :host([inline]) {
       display: inline-block;
