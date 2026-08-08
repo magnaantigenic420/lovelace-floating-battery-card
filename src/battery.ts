@@ -119,9 +119,10 @@ export function getBatterySnapshot(
       : undefined;
 
   const levelEntityAvailable =
-    Boolean(levelEntity) && !['unknown', 'unavailable'].includes(levelEntity.state.toLowerCase());
+    levelEntity !== undefined && !['unknown', 'unavailable'].includes(levelEntity.state.toLowerCase());
   const stateEntityAvailable =
-    !config.state_entity || (Boolean(stateEntity) && !['unavailable'].includes(stateEntity.state.toLowerCase()));
+    !config.state_entity ||
+    (stateEntity !== undefined && !['unavailable'].includes(stateEntity.state.toLowerCase()));
   const available = rawLevel !== undefined && levelEntityAvailable && stateEntityAvailable;
   const semanticState = available ? mapSemanticState(stateValue, rounded, config) : 'unavailable';
   const threshold = selectThreshold(rounded, config.thresholds);
