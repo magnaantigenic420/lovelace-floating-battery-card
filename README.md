@@ -26,15 +26,17 @@ The image above is an illustrated preview of the default floating behavior and c
 
 ## Installation
 
-### HACS custom repository
+### HACS
 
-Until this repository is accepted into HACS defaults:
+[![Open the Floating Battery Card HACS repository](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=moryoav&repository=lovelace-floating-battery-card&category=plugin)
 
-1. Open HACS.
-2. Open the three-dot menu and choose **Custom repositories**.
-3. Add `https://github.com/moryoav/lovelace-floating-battery-card`.
-4. Select **Dashboard** as the category.
-5. Install **Floating Battery Card** and refresh the browser.
+Floating Battery Card is currently installed through HACS as a custom Dashboard repository.
+
+1. Select the button above to open this repository directly in HACS.
+2. Choose **Download**.
+3. Refresh the browser after installation.
+
+If the shortcut is unavailable, open HACS → three-dot menu → **Custom repositories**, add `https://github.com/moryoav/lovelace-floating-battery-card` as a **Dashboard** repository, then download **Floating Battery Card**.
 
 ### Manual
 
