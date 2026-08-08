@@ -21,8 +21,12 @@ export class FloatingBatteryCard extends LitElement {
 
   public set hass(value: HomeAssistant) {
     this._hass = value;
-    if (this.overlay) this.overlay.hass = value;
-    else this.syncOverlay(false);
+    if (this.overlay) {
+      this.overlay.hass = value;
+      this.syncThemeFont(this.overlay);
+    } else {
+      this.syncOverlay(false);
+    }
     this.requestUpdate();
   }
 
