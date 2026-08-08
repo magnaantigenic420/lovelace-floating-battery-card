@@ -28,10 +28,27 @@ export function safeIcon(icon: string | undefined, fallback: string): string {
   return isValidIcon(icon) ? icon! : fallback;
 }
 
-function thresholdColor(threshold: ThresholdConfig | undefined, key: keyof ThresholdConfig): string {
+function thresholdSpecificColor(
+  threshold: ThresholdConfig | undefined,
+  key: keyof ThresholdConfig,
+): string {
   const direct = threshold?.[key];
-  if (typeof direct === 'string' && direct.trim()) return direct;
-  return typeof threshold?.color === 'string' ? threshold.color : '';
+  return typeof direct === 'string' && direct.trim() ? direct : '';
+}
+
+/**
+ * Threshold `color` is an accent shorthand. It applies to foreground accents
+ * (icon, text and ring), but never to the card background or border. Those
+ * require their explicit threshold properties so the default card remains
+ * readable against the Home Assistant card background.
+ */
+function thresholdAccentColor(
+  threshold: ThresholdConfig | undefined,
+  key: keyof ThresholdConfig,
+): string {
+  const direct = thresholdSpecificColor(threshold, key);
+  if (direct) return direct;
+  return typeof threshold?.color === 'string' && threshold.color.trim() ? threshold.color : '';
 }
 
 function stateColor(
@@ -59,8 +76,8 @@ export function resolveColors(
 ): ResolvedColors {
   const state = stateColor(snapshot.semanticState, config);
   const allowState = config.colors.state_overrides_threshold;
-  const pick = (thresholdKey: keyof ThresholdConfig, global: string): string => {
-    const threshold = thresholdColor(snapshot.threshold, thresholdKey);
+  const pickAccent = (thresholdKey: keyof ThresholdConfig, global: string): string => {
+    const threshold = thresholdAccentColor(snapshot.threshold, thresholdKey);
     if (allowState && state) return state;
     if (threshold) return threshold;
     if (!allowState && state) return state;
@@ -68,14 +85,15 @@ export function resolveColors(
   };
 
   return {
-    icon: pick('icon_color', config.colors.icon || 'var(--primary-text-color)'),
-    text: pick('text_color', config.colors.text),
-    background: thresholdColor(snapshot.threshold, 'background_color') || config.colors.background,
-    border: thresholdColor(snapshot.threshold, 'border_color') || config.colors.border,
+    icon: pickAccent('icon_color', config.colors.icon || 'var(--primary-text-color)'),
+    text: pickAccent('text_color', config.colors.text),
+    background:
+      thresholdSpecificColor(snapshot.threshold, 'background_color') || config.colors.background,
+    border: thresholdSpecificColor(snapshot.threshold, 'border_color') || config.colors.border,
     ring:
       config.ring.color_mode === 'fixed'
-        ? config.ring.color || config.colors.ring || pick('ring_color', config.colors.icon)
-        : pick('ring_color', config.ring.color || config.colors.ring || config.colors.icon),
+        ? config.ring.color || config.colors.ring || pickAccent('ring_color', config.colors.icon)
+        : pickAccent('ring_color', config.ring.color || config.colors.ring || config.colors.icon),
     ringTrack: config.ring.track_color || config.colors.ring_track,
   };
 }
