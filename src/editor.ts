@@ -37,11 +37,12 @@ export class FloatingBatteryCardEditor extends LitElement implements LovelaceCar
       `, true)}
 
       ${this.section('State mapping', html`
-        ${this.csv('state_map.charging', 'Charging states', c.state_map?.charging ?? DEFAULT_STATE_MAP.charging)}
-        ${this.csv('state_map.not_charging', 'Not charging states', c.state_map?.not_charging ?? DEFAULT_STATE_MAP.not_charging)}
-        ${this.csv('state_map.full', 'Full states', c.state_map?.full ?? DEFAULT_STATE_MAP.full)}
-        ${this.csv('state_map.unavailable', 'Unavailable states', c.state_map?.unavailable ?? DEFAULT_STATE_MAP.unavailable)}
-        <div class="switches">${this.toggle('state_map.case_sensitive', 'Case sensitive', c.state_map?.case_sensitive ?? false)}${this.toggle('state_map.normalize_whitespace', 'Normalize whitespace', c.state_map?.normalize_whitespace ?? true)}</div>
+        <p class="hint">Add the exact raw values your battery-state entity can report. Matching is case-insensitive by default.</p>
+        ${this.multiText('state_map.charging', 'Charging states', c.state_map?.charging ?? DEFAULT_STATE_MAP.charging)}
+        ${this.multiText('state_map.not_charging', 'Not charging states', c.state_map?.not_charging ?? DEFAULT_STATE_MAP.not_charging)}
+        ${this.multiText('state_map.full', 'Full states', c.state_map?.full ?? DEFAULT_STATE_MAP.full)}
+        ${this.multiText('state_map.unavailable', 'Unavailable states', c.state_map?.unavailable ?? DEFAULT_STATE_MAP.unavailable)}
+        <div class="grid">${this.selector('state_map.case_sensitive', 'Case sensitive', { boolean: {} }, c.state_map?.case_sensitive ?? false)}${this.selector('state_map.normalize_whitespace', 'Normalize whitespace', { boolean: {} }, c.state_map?.normalize_whitespace ?? true)}</div>
       `)}
 
       ${this.section('Thresholds & colors', this.thresholds())}
@@ -115,7 +116,7 @@ export class FloatingBatteryCardEditor extends LitElement implements LovelaceCar
   private number(path:string,label:string,value:number|string,step=1,min?:number,max?:number):TemplateResult { return html`<ha-textfield type="number" .label=${label} .value=${String(value ?? '')} .step=${String(step)} .min=${min===undefined?'':String(min)} .max=${max===undefined?'':String(max)} @input=${(e:Event)=>{const raw=(e.target as HTMLInputElement).value;this.setPath(path,raw===''?undefined:Number(raw));}}></ha-textfield>`; }
   private toggle(path:string,label:string,checked:boolean):TemplateResult { return html`<ha-formfield .label=${label}><ha-switch .checked=${checked} @change=${(e:Event)=>this.setPath(path,(e.target as HTMLInputElement).checked)}></ha-switch></ha-formfield>`; }
   private select(path:string,label:string,value:unknown,options:Array<[string,string]>):TemplateResult { return this.selector(path,label,{select:{options:options.map(([v,l])=>({value:v,label:l})),mode:'dropdown'}},value); }
-  private csv(path:string,label:string,values:string[]):TemplateResult { return html`<ha-textfield .label=${label} .value=${values.join(', ')} @change=${(e:Event)=>this.setPath(path,(e.target as HTMLInputElement).value.split(',').map(v=>v.trim()).filter(Boolean))}></ha-textfield>`; }
+  private multiText(path:string,label:string,values:string[]):TemplateResult { return this.selector(path,label,{text:{multiple:true}},values); }
 
   private readonly addThreshold=():void=>{const rows=[...(this.config?.thresholds ?? DEFAULT_THRESHOLDS)].map(v=>({...v}));rows.push({max:Math.min(100,(rows.at(-1)?.max ?? 0)+10),color:'var(--primary-color)'});this.setPath('thresholds',rows);};
   private removeThreshold(index:number):void { const rows=[...(this.config?.thresholds ?? DEFAULT_THRESHOLDS)].map(v=>({...v}));rows.splice(index,1);this.setPath('thresholds',rows.length?rows:[{max:100,color:'var(--primary-color)'}]); }
