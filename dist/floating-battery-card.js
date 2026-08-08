@@ -202,9 +202,10 @@ function t(t,e,i,o){var n,s=arguments.length,r=s<3?e:null===o?o=Object.getOwnPro
       .active=${!0}
       .sourceHost=${this}
       .config=${t}
-    ></floating-battery-overlay>`}syncPresentationMode(){if(!this.config)return;const t="inline"===this.config.position.mode||Vt(this);this.toggleAttribute("inline",t)}syncOverlay(t=!1){if(!this.isConnected||!this.config)return;if(!("viewport"===this.config.position.mode&&!Vt(this)))return void this.removeOverlay();let e=!1;if(!this.overlay||!this.overlay.isConnected){const t=document.createElement("floating-battery-overlay");t.dataset.floatingBatteryOwner=this.instanceId,t.sourceHost=this,document.body.appendChild(t),this.overlay=t,e=!0}this.overlay.hass=this._hass,this.overlay.sourceHost=this,(e||t)&&this.overlay.setConfig(this.config),this.overlay.active=window.location.pathname===this.sourcePath}removeOverlay(){this.overlay?.remove(),this.overlay=void 0}static{this.styles=r`
+    ></floating-battery-overlay>`}syncPresentationMode(){if(!this.config)return;const t="inline"===this.config.position.mode||Vt(this);this.toggleAttribute("inline",t)}syncOverlay(t=!1){if(!this.isConnected||!this.config)return;if(!("viewport"===this.config.position.mode&&!Vt(this)))return void this.removeOverlay();let e=!1;if(!this.overlay||!this.overlay.isConnected){const t=document.createElement("floating-battery-overlay");t.dataset.floatingBatteryOwner=this.instanceId,t.sourceHost=this,document.body.appendChild(t),this.overlay=t,e=!0}this.overlay.hass=this._hass,this.overlay.sourceHost=this,this.syncThemeFont(this.overlay),(e||t)&&this.overlay.setConfig(this.config),this.overlay.active=window.location.pathname===this.sourcePath}syncThemeFont(t){const e=getComputedStyle(this).fontFamily;e&&(t.style.fontFamily=e),t.style.setProperty("--paper-font-body1_-_font-family","initial")}removeOverlay(){this.overlay?.remove(),this.overlay=void 0}static{this.styles=r`
     :host {
       display: contents;
+      --paper-font-body1_-_font-family: initial;
     }
     :host([inline]) {
       display: inline-block;
