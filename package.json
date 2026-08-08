@@ -1,0 +1,66 @@
+{
+  "name": "lovelace-floating-battery-card",
+  "version": "0.1.0",
+  "description": "A configurable floating battery indicator card for Home Assistant Lovelace dashboards.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "author": "moryoav",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moryoav/lovelace-floating-battery-card.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "lovelace",
+    "custom-card",
+    "hacs",
+    "battery",
+    "dashboard"
+  ],
+  "main": "dist/floating-battery-card.js",
+  "module": "dist/floating-battery-card.js",
+  "files": [
+    "dist/floating-battery-card.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && rollup -c",
+    "lint": "eslint src tests rollup.config.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "custom-card-helpers": "2.0.0",
+    "lit": "^3.3.3",
+    "home-assistant-js-websocket": "9.6.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@rollup/plugin-node-resolve": "^15.2.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "@types/node": "^24.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "happy-dom": "^20.11.1",
+    "prettier": "^3.6.2",
+    "rollup": "^4.52.5",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}
