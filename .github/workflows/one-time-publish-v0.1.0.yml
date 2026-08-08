@@ -1,0 +1,40 @@
+name: One-time publish v0.1.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/one-time-publish-v0.1.0.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Remove one-time helper from main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/one-time-publish-v0.1.0.yml
+          git add .github/workflows/one-time-publish-v0.1.0.yml
+          git commit -m "Remove one-time v0.1.0 publish helper"
+          git push origin HEAD:main
+      - name: Build release from v0.1.0 tag
+        run: |
+          git checkout --detach v0.1.0
+          npm install
+          npm run check
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.1.0 \
+            dist/floating-battery-card.js \
+            --verify-tag \
+            --generate-notes \
+            --title "v0.1.0"
