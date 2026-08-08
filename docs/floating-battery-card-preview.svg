@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Floating Battery Card illustrated preview</title>
+  <desc id="desc">A Home Assistant style dashboard with floating circular battery cards in the bottom right corner.</desc>
+  <defs>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" fill="#101418"/>
+  <rect x="34" y="34" width="1132" height="82" rx="18" fill="#1d252c"/>
+  <text x="70" y="86" fill="#f3f5f7" font-family="Arial, sans-serif" font-size="32" font-weight="700">Kitchen</text>
+  <rect x="34" y="142" width="550" height="220" rx="18" fill="#1d252c"/>
+  <rect x="610" y="142" width="556" height="220" rx="18" fill="#1d252c"/>
+  <rect x="34" y="388" width="760" height="253" rx="18" fill="#1d252c"/>
+  <text x="64" y="187" fill="#98a6b3" font-family="Arial, sans-serif" font-size="20">Dashboard content</text>
+  <g filter="url(#shadow)">
+    <circle cx="1092" cy="574" r="51" fill="#202930" stroke="#394650" stroke-width="2"/>
+    <rect x="1068" y="535" width="47" height="24" rx="5" fill="none" stroke="#4caf50" stroke-width="5"/>
+    <rect x="1115" y="542" width="6" height="10" rx="2" fill="#4caf50"/>
+    <rect x="1074" y="541" width="34" height="12" rx="2" fill="#4caf50"/>
+    <text x="1092" y="595" text-anchor="middle" fill="#4caf50" font-family="Arial, sans-serif" font-size="20" font-weight="700">82%</text>
+  </g>
+  <g filter="url(#shadow)" transform="translate(-120 0)">
+    <circle cx="1092" cy="574" r="51" fill="#202930" stroke="#394650" stroke-width="2"/>
+    <path d="M1071 536h42v24h-42z" fill="none" stroke="#ff9800" stroke-width="5" rx="5"/>
+    <path d="M1094 533l-12 16h10l-5 15 17-20h-10z" fill="#ff9800"/>
+    <rect x="1114" y="543" width="7" height="10" rx="2" fill="#ff9800"/>
+    <text x="1092" y="595" text-anchor="middle" fill="#ff9800" font-family="Arial, sans-serif" font-size="20" font-weight="700">43%</text>
+  </g>
+  <g filter="url(#shadow)" transform="translate(-240 0)">
+    <circle cx="1092" cy="574" r="51" fill="#202930" stroke="#394650" stroke-width="2"/>
+    <rect x="1068" y="535" width="47" height="24" rx="5" fill="none" stroke="#f44336" stroke-width="5"/>
+    <rect x="1115" y="542" width="6" height="10" rx="2" fill="#f44336"/>
+    <rect x="1074" y="541" width="7" height="12" rx="2" fill="#f44336"/>
+    <text x="1092" y="595" text-anchor="middle" fill="#f44336" font-family="Arial, sans-serif" font-size="20" font-weight="700">12%</text>
+  </g>
+  <text x="64" y="625" fill="#748390" font-family="Arial, sans-serif" font-size="17">Illustrated preview · viewport-fixed · configurable thresholds, icons and colors</text>
+</svg>
