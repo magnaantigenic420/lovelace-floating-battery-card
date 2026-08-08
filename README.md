@@ -1,8 +1,17 @@
 # Floating Battery Card
 
+[![CI](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml)
+[![HACS validation](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml)
+
 A standalone Home Assistant Lovelace card that keeps a battery indicator fixed to a viewport corner, independent of dashboard columns and vertical scrolling.
 
 It was designed for wall tablets, phones, laptops, UPS devices, vehicle batteries, and any other battery sensor you want visible while scrolling a dashboard.
+
+## Preview
+
+![Floating Battery Card illustrated preview](docs/floating-battery-card-preview.svg)
+
+The image above is an illustrated preview of the default floating behavior and configurable battery states; the actual card renders directly from your Home Assistant entities and theme.
 
 ## Highlights
 
