@@ -3,6 +3,8 @@
 [![CI](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml)
 [![HACS validation](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y5B124NZ2L)
+
 A standalone Home Assistant Lovelace card that keeps a battery indicator fixed to a viewport corner, independent of dashboard columns and vertical scrolling.
 
 It was designed for wall tablets, phones, laptops, UPS devices, vehicle batteries, and any other battery sensor you want visible while scrolling a dashboard.
