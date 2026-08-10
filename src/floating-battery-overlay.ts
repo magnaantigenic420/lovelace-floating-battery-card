@@ -28,10 +28,10 @@ export class FloatingBatteryOverlay extends LitElement {
   @property({ type: Boolean, reflect: true }) public active = true;
   @property({ attribute: false }) public sourceHost?: HTMLElement;
 
-  @property({ attribute: false }) public config?: NormalizedFloatingBatteryCardConfig;
   @state() private viewportWidth = window.innerWidth;
   @state() private autoHidden = false;
 
+  private _config?: NormalizedFloatingBatteryCardConfig;
   private lastFingerprint = '';
   private autoHideTimer?: number;
   private readonly actions = new ActionController(
@@ -39,12 +39,22 @@ export class FloatingBatteryOverlay extends LitElement {
     () => this.config,
   );
 
-  public setConfig(config: NormalizedFloatingBatteryCardConfig): void {
-    this.config = config;
+  public get config(): NormalizedFloatingBatteryCardConfig | undefined {
+    return this._config;
+  }
+
+  public set config(config: NormalizedFloatingBatteryCardConfig | undefined) {
+    const previous = this._config;
+    if (config === previous) return;
+    this._config = config;
     this.autoHidden = false;
     this.lastFingerprint = '';
     this.clearAutoHide();
-    this.requestUpdate();
+    this.requestUpdate('config', previous);
+  }
+
+  public setConfig(config: NormalizedFloatingBatteryCardConfig): void {
+    this.config = config;
   }
 
   public override connectedCallback(): void {

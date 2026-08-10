@@ -15,6 +15,7 @@ import { isEditorContext } from './utils';
 @customElement('floating-battery-card')
 export class FloatingBatteryCard extends LitElement {
   private config?: NormalizedFloatingBatteryCardConfig;
+  private inlineConfig?: NormalizedFloatingBatteryCardConfig;
   private _hass?: HomeAssistant;
   private overlay?: FloatingBatteryOverlay;
   private sourcePath = window.location.pathname;
@@ -36,6 +37,10 @@ export class FloatingBatteryCard extends LitElement {
 
   public setConfig(config: FloatingBatteryCardConfig): void {
     this.config = normalizeConfig(config);
+    this.inlineConfig = {
+      ...this.config,
+      position: { ...this.config.position, mode: 'inline' },
+    };
     this.syncPresentationMode();
     this.syncOverlay(true);
     this.requestUpdate();
@@ -90,15 +95,11 @@ export class FloatingBatteryCard extends LitElement {
     const inline = this.config.position.mode === 'inline' || isEditorContext(this);
     if (!inline) return nothing;
 
-    const inlineConfig: NormalizedFloatingBatteryCardConfig = {
-      ...this.config,
-      position: { ...this.config.position, mode: 'inline' },
-    };
     return html`<floating-battery-overlay
       .hass=${this._hass}
       .active=${true}
       .sourceHost=${this}
-      .config=${inlineConfig}
+      .config=${this.inlineConfig}
     ></floating-battery-overlay>`;
   }
 
