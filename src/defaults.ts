@@ -11,7 +11,7 @@ import type {
   ThresholdConfig,
 } from './types';
 
-export const CARD_VERSION = '0.1.0';
+export const CARD_VERSION = '0.1.1';
 
 export const DEFAULT_THRESHOLDS: ThresholdConfig[] = [
   { max: 20, color: 'var(--error-color, #f44336)' },

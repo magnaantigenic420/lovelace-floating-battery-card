@@ -1,6 +1,6 @@
 {
   "name": "lovelace-floating-battery-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A configurable floating battery indicator card for Home Assistant Lovelace dashboards.",
   "type": "module",
   "private": false,
@@ -30,7 +30,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "build": "npm run clean && rollup -c",
     "lint": "eslint src tests rollup.config.js",
     "format": "prettier --write .",
