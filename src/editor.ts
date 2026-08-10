@@ -14,6 +14,18 @@ import {
 } from './defaults';
 import type { FloatingBatteryCardConfig } from './types';
 
+const BARE_NUMBER = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
+
+function parseDimensionInput(value: string): number | string | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  if (BARE_NUMBER.test(trimmed)) {
+    const number = Number(trimmed);
+    if (Number.isFinite(number)) return number;
+  }
+  return trimmed;
+}
+
 @customElement('floating-battery-card-editor')
 export class FloatingBatteryCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -112,7 +124,7 @@ export class FloatingBatteryCardEditor extends LitElement implements LovelaceCar
   private section(title:string, content:TemplateResult, open=false):TemplateResult { return html`<details ?open=${open}><summary>${title}</summary><div class="body">${content}</div></details>`; }
   private selector(path:string,label:string,selector:object,value:unknown,required=false):TemplateResult { return html`<ha-selector .hass=${this.hass} .selector=${selector} .value=${value} .label=${label} .required=${required} @value-changed=${(e:CustomEvent)=>this.setPath(path,e.detail.value)}></ha-selector>`; }
   private text(path:string,label:string,value:string):TemplateResult { return html`<ha-textfield .label=${label} .value=${value} @input=${(e:Event)=>this.setPath(path,(e.target as HTMLInputElement).value)}></ha-textfield>`; }
-  private dimension(path:string,label:string,value:number|string):TemplateResult { return this.text(path,label,String(value ?? '')); }
+  private dimension(path:string,label:string,value:number|string):TemplateResult { return html`<ha-textfield .label=${label} .value=${String(value ?? '')} @input=${(e:Event)=>this.setPath(path,parseDimensionInput((e.target as HTMLInputElement).value))}></ha-textfield>`; }
   private number(path:string,label:string,value:number|string,step=1,min?:number,max?:number):TemplateResult { return html`<ha-textfield type="number" .label=${label} .value=${String(value ?? '')} .step=${String(step)} .min=${min===undefined?'':String(min)} .max=${max===undefined?'':String(max)} @input=${(e:Event)=>{const raw=(e.target as HTMLInputElement).value;this.setPath(path,raw===''?undefined:Number(raw));}}></ha-textfield>`; }
   private toggle(path:string,label:string,checked:boolean):TemplateResult { return html`<ha-formfield .label=${label}><ha-switch .checked=${checked} @change=${(e:Event)=>this.setPath(path,(e.target as HTMLInputElement).checked)}></ha-switch></ha-formfield>`; }
   private select(path:string,label:string,value:unknown,options:Array<[string,string]>):TemplateResult { return this.selector(path,label,{select:{options:options.map(([v,l])=>({value:v,label:l})),mode:'dropdown'}},value); }
