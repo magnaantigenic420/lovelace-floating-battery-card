@@ -16,6 +16,7 @@ import type {
   StateMapConfig,
   ThresholdConfig,
 } from './types';
+import { validateConfig } from './validate';
 
 const cloneThresholds = (thresholds: ThresholdConfig[]): ThresholdConfig[] =>
   thresholds.map((threshold) => ({ ...threshold }));
@@ -73,6 +74,7 @@ export function normalizeConfig(config: FloatingBatteryCardConfig): NormalizedFl
   if (!config.entity || typeof config.entity !== 'string') {
     throw new Error('Floating Battery Card requires an entity.');
   }
+  validateConfig(config);
 
   const minLevel = Number.isFinite(Number(config.min_level)) ? Number(config.min_level) : 0;
   const maxLevel = Number.isFinite(Number(config.max_level)) ? Number(config.max_level) : 100;

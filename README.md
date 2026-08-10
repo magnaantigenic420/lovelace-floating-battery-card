@@ -270,6 +270,16 @@ For `shape: circle`, width and height are deliberately forced equal even if only
 
 Standard Home Assistant action configuration is accepted for `tap_action`, `hold_action`, and `double_tap_action`. The default tap action is `more-info`.
 
+### Runtime validation
+
+Configuration is validated when Home Assistant calls `setConfig`, so invalid YAML reports the exact field instead of failing during rendering. CSS-capable dimension fields continue to accept finite pixel numbers or strings such as `1rem`, `2vh`, and `calc(...)`.
+
+- `precision` must be an integer from 0 to 4; `full_threshold` and animation low-battery thresholds must be from 0 to 100.
+- Opacity values must be from 0 to 1, and `active_scale` must be greater than 0.
+- Durations, auto-hide delay, ring inset, and viewport-width limits must be non-negative. Ring width must be at least 1.
+- `max_viewport_width: 0` disables the maximum; otherwise it must be at least `min_viewport_width` when both limits are enabled.
+- Nested sections must be objects, state mappings and thresholds must be arrays of the documented shapes, and actions must contain a non-empty `action` string.
+
 ## Why viewport mode survives scrolling
 
 The Lovelace card host itself renders with `display: contents`, so it occupies no visible row. The rendered battery control is created as a separate custom element under `document.body` with `position: fixed`. Because it is no longer a descendant of `layout-card`, CSS Grid, masonry, or a transformed scrolling container, those ancestors cannot turn fixed positioning into container-relative positioning.

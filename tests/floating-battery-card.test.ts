@@ -180,6 +180,18 @@ describe('configuration validation', () => {
       } as unknown as Parameters<FloatingBatteryCard['setConfig']>[0]),
     ).toThrow('state_map.charging must be an array of strings.');
   });
+
+  it('surfaces nested runtime validation errors from setConfig', () => {
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+
+    expect(() =>
+      card.setConfig({
+        type: 'custom:floating-battery-card',
+        entity: 'sensor.battery',
+        appearance: { opacity: 2 },
+      }),
+    ).toThrow('appearance.opacity');
+  });
 });
 
 describe('Home Assistant grid sizing', () => {
