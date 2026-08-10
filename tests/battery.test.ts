@@ -1,12 +1,41 @@
 import { describe, expect, it } from 'vitest';
+import type { HomeAssistant } from 'custom-card-helpers';
+import type { HassEntity } from 'home-assistant-js-websocket';
 
-import { mapSemanticState, normalizeLevel, parseNumericState, selectIcon, selectThreshold } from '../src/battery';
+import {
+  getBatterySnapshot,
+  mapSemanticState,
+  normalizeLevel,
+  parseNumericState,
+  selectIcon,
+  selectThreshold,
+} from '../src/battery';
 import { normalizeConfig } from '../src/normalize';
 
 const config = normalizeConfig({
   type: 'custom:floating-battery-card',
   entity: 'sensor.battery',
 });
+
+function entity(entityId: string, state: string): HassEntity {
+  return {
+    entity_id: entityId,
+    state,
+    attributes: {},
+    context: { id: '', parent_id: null, user_id: null },
+    last_changed: '',
+    last_updated: '',
+  };
+}
+
+function hassWithState(state: string): HomeAssistant {
+  return {
+    states: {
+      'sensor.battery': entity('sensor.battery', '50'),
+      'sensor.battery_state': entity('sensor.battery_state', state),
+    },
+  } as unknown as HomeAssistant;
+}
 
 describe('parseNumericState', () => {
   it.each([
@@ -53,6 +82,46 @@ describe('state mapping', () => {
     expect(mapSemanticState('Not   Charging', 50, config)).toBe('not_charging');
     expect(mapSemanticState('FULL', 100, config)).toBe('full');
     expect(mapSemanticState('unavailable', undefined, config)).toBe('unavailable');
+  });
+
+  it('treats a default mapped unknown state as unavailable', () => {
+    const stateConfig = normalizeConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      state_entity: 'sensor.battery_state',
+    });
+
+    const snapshot = getBatterySnapshot(hassWithState('unknown'), stateConfig);
+
+    expect(snapshot.semanticState).toBe('unavailable');
+    expect(snapshot.available).toBe(false);
+  });
+
+  it('treats custom unavailable mappings as unavailable', () => {
+    const stateConfig = normalizeConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      state_entity: 'sensor.battery_state',
+      state_map: { unavailable: ['offline'] },
+    });
+
+    const snapshot = getBatterySnapshot(hassWithState('offline'), stateConfig);
+
+    expect(snapshot.semanticState).toBe('unavailable');
+    expect(snapshot.available).toBe(false);
+  });
+
+  it('keeps an available unmapped state semantically unknown', () => {
+    const stateConfig = normalizeConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      state_entity: 'sensor.battery_state',
+    });
+
+    const snapshot = getBatterySnapshot(hassWithState('idle'), stateConfig);
+
+    expect(snapshot.semanticState).toBe('unknown');
+    expect(snapshot.available).toBe(true);
   });
 });
 
