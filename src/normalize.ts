@@ -13,11 +13,36 @@ import {
 import type {
   FloatingBatteryCardConfig,
   NormalizedFloatingBatteryCardConfig,
+  StateMapConfig,
   ThresholdConfig,
 } from './types';
 
 const cloneThresholds = (thresholds: ThresholdConfig[]): ThresholdConfig[] =>
   thresholds.map((threshold) => ({ ...threshold }));
+
+const STATE_ARRAY_KEYS = ['charging', 'not_charging', 'full', 'unavailable'] as const;
+
+export function normalizeStateMap(input?: StateMapConfig): Required<StateMapConfig> {
+  const normalized: Required<StateMapConfig> = {
+    ...DEFAULT_STATE_MAP,
+    ...(input ?? {}),
+    charging: [...DEFAULT_STATE_MAP.charging],
+    not_charging: [...DEFAULT_STATE_MAP.not_charging],
+    full: [...DEFAULT_STATE_MAP.full],
+    unavailable: [...DEFAULT_STATE_MAP.unavailable],
+  };
+
+  for (const key of STATE_ARRAY_KEYS) {
+    const values = input?.[key];
+    if (values === undefined) continue;
+    if (!Array.isArray(values) || values.some((value) => typeof value !== 'string')) {
+      throw new Error(`state_map.${key} must be an array of strings.`);
+    }
+    normalized[key] = [...values];
+  }
+
+  return normalized;
+}
 
 export function normalizeThresholds(input?: ThresholdConfig[]): ThresholdConfig[] {
   const source = input?.length ? input : DEFAULT_THRESHOLDS;
@@ -72,7 +97,7 @@ export function normalizeConfig(config: FloatingBatteryCardConfig): NormalizedFl
     unit: config.unit ?? '%',
     full_threshold: Number.isFinite(Number(config.full_threshold)) ? Number(config.full_threshold) : 100,
     thresholds: normalizeThresholds(config.thresholds),
-    state_map: { ...DEFAULT_STATE_MAP, ...(config.state_map ?? {}) },
+    state_map: normalizeStateMap(config.state_map),
     icons: { ...DEFAULT_ICONS, ...(config.icons ?? {}) },
     colors: { ...DEFAULT_COLORS, ...(config.colors ?? {}) },
     display: { ...DEFAULT_DISPLAY, ...(config.display ?? {}) },

@@ -33,6 +33,39 @@ describe('normalizeConfig', () => {
   it('rejects invalid ranges', () => {
     expect(() => normalizeConfig({ ...minimal, min_level: 100, max_level: 100 })).toThrow(/max_level/);
   });
+
+  it('preserves valid and intentionally empty state arrays', () => {
+    const config = normalizeConfig({
+      ...minimal,
+      state_map: {
+        charging: ['Charging', 'Powering up'],
+        not_charging: [],
+        full: ['Full'],
+        unavailable: [],
+      },
+    });
+
+    expect(config.state_map.charging).toEqual(['Charging', 'Powering up']);
+    expect(config.state_map.not_charging).toEqual([]);
+    expect(config.state_map.full).toEqual(['Full']);
+    expect(config.state_map.unavailable).toEqual([]);
+  });
+
+  it.each(['charging', 'not_charging', 'full', 'unavailable'] as const)(
+    'rejects malformed state_map.%s values during configuration',
+    (key) => {
+      for (const value of ['Charging', null, ['Charging', 1], [false]]) {
+        const config = {
+          ...minimal,
+          state_map: { [key]: value },
+        } as unknown as Parameters<typeof normalizeConfig>[0];
+
+        expect(() => normalizeConfig(config)).toThrow(
+          `state_map.${key} must be an array of strings.`,
+        );
+      }
+    },
+  );
 });
 
 describe('normalizeThresholds', () => {

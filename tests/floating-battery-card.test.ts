@@ -167,3 +167,17 @@ describe('Home Assistant editor contexts', () => {
     expect(document.body.querySelector('floating-battery-overlay[data-floating-battery-owner]')).toBeNull();
   });
 });
+
+describe('configuration validation', () => {
+  it('surfaces malformed state maps from setConfig', () => {
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+
+    expect(() =>
+      card.setConfig({
+        type: 'custom:floating-battery-card',
+        entity: 'sensor.battery',
+        state_map: { charging: ['Charging', 1] },
+      } as unknown as Parameters<FloatingBatteryCard['setConfig']>[0]),
+    ).toThrow('state_map.charging must be an array of strings.');
+  });
+});
