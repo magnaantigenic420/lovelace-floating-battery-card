@@ -12,7 +12,7 @@ import {
   DEFAULT_STATE_MAP,
   DEFAULT_THRESHOLDS,
 } from './defaults';
-import type { FloatingBatteryCardConfig } from './types';
+import type { FloatingBatteryCardConfig, ThresholdConfig } from './types';
 
 const BARE_NUMBER = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
 
@@ -117,8 +117,8 @@ export class FloatingBatteryCardEditor extends LitElement implements LovelaceCar
   }
 
   private thresholds(): TemplateResult {
-    const rows = this.config?.thresholds ?? DEFAULT_THRESHOLDS;
-    return html`<p class="hint">Rows are normalized by ascending max. Color is shorthand; per-property colors override it.</p>${rows.map((t,i)=>html`<div class="threshold"><header><b>Band ${i+1}</b><span><button @click=${()=>this.moveThreshold(i,-1)} ?disabled=${i===0}>↑</button><button @click=${()=>this.moveThreshold(i,1)} ?disabled=${i===rows.length-1}>↓</button><button @click=${()=>this.removeThreshold(i)}>×</button></span></header><div class="grid">${this.number(`thresholds.${i}.min`,'Min',t.min ?? '')}${this.number(`thresholds.${i}.max`,'Max',t.max)}</div>${this.text(`thresholds.${i}.color`,'Color',t.color ?? '')}<div class="grid">${this.text(`thresholds.${i}.icon_color`,'Icon color',t.icon_color ?? '')}${this.text(`thresholds.${i}.text_color`,'Text color',t.text_color ?? '')}${this.text(`thresholds.${i}.background_color`,'Background',t.background_color ?? '')}${this.text(`thresholds.${i}.border_color`,'Border',t.border_color ?? '')}${this.text(`thresholds.${i}.ring_color`,'Ring',t.ring_color ?? '')}${this.selector(`thresholds.${i}.icon`,'Icon override',{ icon: {} },t.icon ?? '')}${this.select(`thresholds.${i}.animation`,'Animation',t.animation ?? 'none',[['none','None'],['pulse','Pulse'],['blink','Blink'],['breathe','Breathe'],['glow','Glow'],['rotate','Rotate']])}</div></div>`)}<button @click=${this.addThreshold}>+ Add threshold</button>`;
+    const rows = this.thresholdRows();
+    return html`<p class="hint">Bands are displayed and evaluated in ascending maximum level. Color is shorthand; per-property colors override it.</p>${rows.map((threshold,index)=>{const band=`Band ${index+1}`;return html`<div class="threshold"><header><b>${band}</b><button type="button" aria-label=${`Remove threshold ${band.toLowerCase()}`} title=${`Remove ${band.toLowerCase()}`} @click=${()=>this.removeThreshold(index)}>×</button></header><div class="grid">${this.number(`thresholds.${index}.min`,`${band} minimum`,threshold.min ?? '')}${this.number(`thresholds.${index}.max`,`${band} maximum`,threshold.max)}</div>${this.text(`thresholds.${index}.color`,`${band} color`,threshold.color ?? '')}<div class="grid">${this.text(`thresholds.${index}.icon_color`,`${band} icon color`,threshold.icon_color ?? '')}${this.text(`thresholds.${index}.text_color`,`${band} text color`,threshold.text_color ?? '')}${this.text(`thresholds.${index}.background_color`,`${band} background`,threshold.background_color ?? '')}${this.text(`thresholds.${index}.border_color`,`${band} border`,threshold.border_color ?? '')}${this.text(`thresholds.${index}.ring_color`,`${band} ring`,threshold.ring_color ?? '')}${this.selector(`thresholds.${index}.icon`,`${band} icon override`,{ icon: {} },threshold.icon ?? '')}${this.select(`thresholds.${index}.animation`,`${band} animation`,threshold.animation ?? 'none',[['none','None'],['pulse','Pulse'],['blink','Blink'],['breathe','Breathe'],['glow','Glow'],['rotate','Rotate']])}</div></div>`;})}<button type="button" aria-label="Add threshold band" @click=${this.addThreshold}>+ Add threshold band</button>`;
   }
 
   private section(title:string, content:TemplateResult, open=false):TemplateResult { return html`<details ?open=${open}><summary>${title}</summary><div class="body">${content}</div></details>`; }
@@ -130,18 +130,21 @@ export class FloatingBatteryCardEditor extends LitElement implements LovelaceCar
   private select(path:string,label:string,value:unknown,options:Array<[string,string]>):TemplateResult { return this.selector(path,label,{select:{options:options.map(([v,l])=>({value:v,label:l})),mode:'dropdown'}},value); }
   private multiText(path:string,label:string,values:string[]):TemplateResult { return this.selector(path,label,{text:{multiple:true}},values); }
 
-  private readonly addThreshold=():void=>{const rows=[...(this.config?.thresholds ?? DEFAULT_THRESHOLDS)].map(v=>({...v}));rows.push({max:Math.min(100,(rows.at(-1)?.max ?? 0)+10),color:'var(--primary-color)'});this.setPath('thresholds',rows);};
-  private removeThreshold(index:number):void { const rows=[...(this.config?.thresholds ?? DEFAULT_THRESHOLDS)].map(v=>({...v}));rows.splice(index,1);this.setPath('thresholds',rows.length?rows:[{max:100,color:'var(--primary-color)'}]); }
-  private moveThreshold(index:number,direction:-1|1):void { const rows=[...(this.config?.thresholds ?? DEFAULT_THRESHOLDS)].map(v=>({...v}));const target=index+direction;if(target<0||target>=rows.length)return;[rows[index],rows[target]]=[rows[target]!,rows[index]!];this.setPath('thresholds',rows); }
+  private sortThresholds(source:ThresholdConfig[]):ThresholdConfig[] { const minimum=(threshold:ThresholdConfig):number=>threshold.min===undefined?Number.NEGATIVE_INFINITY:Number(threshold.min);return source.map(threshold=>({...threshold})).sort((a,b)=>Number(a.max)-Number(b.max)||minimum(a)-minimum(b)); }
+  private thresholdRows():ThresholdConfig[] { const source=this.config?.thresholds?.length?this.config.thresholds:DEFAULT_THRESHOLDS;return this.sortThresholds(source); }
+  private readonly addThreshold=():void=>{const rows=this.thresholdRows();rows.push({max:Math.min(100,(rows.at(-1)?.max ?? 0)+10),color:'var(--primary-color)'});this.setPath('thresholds',rows);};
+  private removeThreshold(index:number):void { const rows=this.thresholdRows();rows.splice(index,1);this.setPath('thresholds',rows.length?rows:[{max:100,color:'var(--primary-color)'}]); }
 
   private setPath(path:string,value:unknown):void {
     if(!this.config)return;
     const next=structuredClone(this.config) as Record<string,any>;
-    if(/^thresholds\.\d+\./.test(path) && next.thresholds === undefined) next.thresholds=DEFAULT_THRESHOLDS.map(threshold=>({...threshold}));
+    const thresholdField=/^thresholds\.\d+\./.test(path);
+    if(thresholdField) next.thresholds=this.thresholdRows();
     const parts=path.split('.'); let cursor:Record<string,any>|any[]=next;
     for(let i=0;i<parts.length-1;i+=1){const p=parts[i]!;const np=parts[i+1]!;if(Array.isArray(cursor)){const n=Number(p);cursor[n]??=/^\d+$/.test(np)?[]:{};cursor=cursor[n];}else{cursor[p]??=/^\d+$/.test(np)?[]:{};cursor=cursor[p];}}
     const last=parts.at(-1)!;
     if(Array.isArray(cursor)){const n=Number(last);if(value===undefined||value==='')delete cursor[n];else cursor[n]=value;}else if(value===undefined||value==='')delete cursor[last];else cursor[last]=value;
+    if(thresholdField) next.thresholds=this.sortThresholds(next.thresholds as ThresholdConfig[]);
     this.config=next as FloatingBatteryCardConfig;
     this.dispatchEvent(new CustomEvent('config-changed',{detail:{config:this.config},bubbles:true,composed:true}));
   }

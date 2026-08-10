@@ -193,20 +193,20 @@ describe('dimension editor', () => {
 
 describe('threshold editor defaults', () => {
   it.each([
-    { name: 'color', property: 'color', label: 'Color', value: '#123456', selector: false },
-    { name: 'min', property: 'min', label: 'Min', value: '21', selector: false },
-    { name: 'max', property: 'max', label: 'Max', value: '55', selector: false },
+    { name: 'color', property: 'color', label: 'Band 2 color', value: '#123456', selector: false },
+    { name: 'min', property: 'min', label: 'Band 2 minimum', value: '21', selector: false },
+    { name: 'max', property: 'max', label: 'Band 2 maximum', value: '55', selector: false },
     {
       name: 'icon',
       property: 'icon',
-      label: 'Icon override',
+      label: 'Band 2 icon override',
       value: 'mdi:battery-50',
       selector: true,
     },
     {
       name: 'animation',
       property: 'animation',
-      label: 'Animation',
+      label: 'Band 2 animation',
       value: 'pulse',
       selector: true,
     },
@@ -217,8 +217,8 @@ describe('threshold editor defaults', () => {
       await editor.updateComplete;
 
       const changed = selector
-        ? editSelector(editor, label, value, 1)
-        : editTextField(editor, label, value, 1);
+        ? editSelector(editor, label, value)
+        : editTextField(editor, label, value);
       const expected = property === 'min' || property === 'max' ? Number(value) : value;
 
       expect(changed.thresholds).toHaveLength(3);
@@ -231,4 +231,99 @@ describe('threshold editor defaults', () => {
       expect(changed.thresholds![2]).toMatchObject({ max: 100 });
     },
   );
+});
+
+describe('threshold editor controls', () => {
+  it('gives every control a descriptive accessible name and omits move controls', async () => {
+    const editor = createEditor();
+    await editor.updateComplete;
+
+    const thresholdSection = [...editor.shadowRoot!.querySelectorAll('details')].find(
+      (section) => section.querySelector('summary')?.textContent === 'Thresholds & colors',
+    )!;
+    const controls = [
+      ...thresholdSection.querySelectorAll<HTMLElement>('ha-textfield, ha-selector, button'),
+    ];
+
+    expect(controls.length).toBeGreaterThan(0);
+    for (const control of controls) {
+      const name =
+        (control as HTMLElement & { label?: string }).label ??
+        control.getAttribute('aria-label') ??
+        control.textContent?.trim();
+      expect(name).toBeTruthy();
+    }
+    expect(thresholdSection.textContent).not.toContain('↑');
+    expect(thresholdSection.textContent).not.toContain('↓');
+  });
+
+  it('displays and edits bands in the same order used at runtime', async () => {
+    const thresholds = [
+      { max: 100, color: 'green' },
+      { max: 20, color: 'red' },
+      { max: 50, color: 'orange' },
+    ];
+    const editor = createEditor({ thresholds });
+    await editor.updateComplete;
+
+    const maximums = [...editor.shadowRoot!.querySelectorAll('ha-textfield')]
+      .filter((field) =>
+        ((field as HTMLElement & { label?: string }).label ?? '').endsWith(' maximum'),
+      )
+      .map((field) => Number((field as HTMLElement & { value?: string }).value));
+
+    expect(maximums).toEqual([20, 50, 100]);
+    expect(maximums).toEqual(
+      normalizeConfig({
+        type: 'custom:floating-battery-card',
+        entity: 'sensor.battery',
+        thresholds,
+      }).thresholds.map((threshold) => threshold.max),
+    );
+
+    const changed = editTextField(editor, 'Band 1 maximum', '70');
+    expect(changed.thresholds!.map((threshold) => threshold.max)).toEqual([50, 70, 100]);
+    expect(changed.thresholds!.map((threshold) => threshold.color)).toEqual([
+      'orange',
+      'red',
+      'green',
+    ]);
+    await editor.updateComplete;
+    const renderedAfterEdit = [...editor.shadowRoot!.querySelectorAll('ha-textfield')]
+      .filter((field) =>
+        ((field as HTMLElement & { label?: string }).label ?? '').endsWith(' maximum'),
+      )
+      .map((field) => Number((field as HTMLElement & { value?: string }).value));
+    expect(renderedAfterEdit).toEqual([50, 70, 100]);
+  });
+
+  it('keeps the named remove action keyboard focusable and operable', async () => {
+    const editor = createEditor();
+    await editor.updateComplete;
+
+    const remove = editor.shadowRoot!.querySelector<HTMLButtonElement>(
+      'button[aria-label="Remove threshold band 1"]',
+    )!;
+    let changed: FloatingBatteryCardConfig | undefined;
+    editor.addEventListener(
+      'config-changed',
+      (event) => {
+        changed = (event as CustomEvent<{ config: FloatingBatteryCardConfig }>).detail.config;
+      },
+      { once: true },
+    );
+
+    expect(remove.tagName).toBe('BUTTON');
+    expect(remove.tabIndex).toBe(0);
+    remove.focus();
+    expect(editor.shadowRoot!.activeElement).toBe(remove);
+    expect(
+      remove.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })),
+    ).toBe(true);
+    // Synthetic keyboard events do not perform browser default actions in Happy DOM.
+    // This click is the native button activation that Enter produces in a browser.
+    remove.click();
+
+    expect(changed?.thresholds?.map((threshold) => threshold.max)).toEqual([50, 100]);
+  });
 });
