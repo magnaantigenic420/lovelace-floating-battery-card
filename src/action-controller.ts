@@ -1,5 +1,17 @@
 import type { NormalizedFloatingBatteryCardConfig } from './types';
 
+const SUPPORTED_ACTIONS = new Set([
+  'none',
+  'more-info',
+  'navigate',
+  'url',
+  'toggle',
+  'perform-action',
+  'call-service',
+  'assist',
+  'fire-dom-event',
+]);
+
 export class ActionController {
   private holdTimer?: number;
   private singleTapTimer?: number;
@@ -82,6 +94,21 @@ export class ActionController {
     const config = this.getConfig();
     const target = this.getActionTarget();
     if (!config || !target) return;
+    const field = action === 'double_tap' ? 'double_tap_action' : `${action}_action`;
+    const actionConfig = config[field];
+    const actionType = actionConfig?.action;
+    if (typeof actionType !== 'string' || !SUPPORTED_ACTIONS.has(actionType)) {
+      const message = `Floating Battery Card: unsupported action type "${String(actionType)}" in ${field}.`;
+      console.warn(message, actionConfig);
+      target.dispatchEvent(
+        new CustomEvent('hass-notification', {
+          detail: { message },
+          bubbles: true,
+          composed: true,
+        }),
+      );
+      return;
+    }
     target.dispatchEvent(
       new CustomEvent('hass-action', {
         detail: { config, action },

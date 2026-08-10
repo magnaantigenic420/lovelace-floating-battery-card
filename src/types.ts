@@ -1,4 +1,30 @@
-import type { ActionConfig, HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';
+import type { HomeAssistant, LovelaceCardConfig } from 'custom-card-helpers';
+import type { HassServiceTarget } from 'home-assistant-js-websocket';
+
+export interface ActionConfirmationConfig {
+  text?: string;
+  title?: string;
+  confirm_text?: string;
+  dismiss_text?: string;
+  exemptions?: Array<{ user: string }>;
+}
+
+export interface ActionConfig {
+  action: string;
+  confirmation?: ActionConfirmationConfig;
+  entity?: string;
+  navigation_path?: string;
+  navigation_replace?: boolean;
+  url_path?: string;
+  service?: string;
+  perform_action?: string;
+  service_data?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+  target?: HassServiceTarget;
+  pipeline_id?: string;
+  start_listening?: boolean;
+  [key: string]: unknown;
+}
 
 export type BatterySemanticState = 'charging' | 'not_charging' | 'full' | 'unavailable' | 'unknown';
 export type Anchor =
