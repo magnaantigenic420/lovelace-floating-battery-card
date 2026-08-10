@@ -136,6 +136,70 @@ describe('ActionController', () => {
     }
   });
 
+  it.each<Gesture>(['tap', 'hold', 'double_tap'])(
+    'applies the more-info entity override only to the %s more-info action',
+    (gesture) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(1_000);
+      const { homeAssistant, host } = createLovelaceTree();
+      const baseConfig = config();
+      const field = gesture === 'double_tap' ? 'double_tap_action' : `${gesture}_action`;
+      const actionConfig = config({
+        behavior: { ...baseConfig.behavior, more_info_entity: 'sensor.battery_details' },
+        [field]: { action: 'more-info' },
+      });
+      const listener = vi.fn();
+      homeAssistant.addEventListener('hass-action', listener);
+
+      activate(
+        new ActionController(
+          () => host,
+          () => actionConfig,
+        ),
+        gesture,
+      );
+
+      expect(listener).toHaveBeenCalledOnce();
+      const event = listener.mock.calls[0]![0] as CustomEvent;
+      expect(event.detail.config.entity).toBe('sensor.battery');
+      expect(event.detail.config[field]).toEqual({
+        action: 'more-info',
+        entity: 'sensor.battery_details',
+      });
+      expect(actionConfig[field]).toEqual({ action: 'more-info' });
+    },
+  );
+
+  it.each<Gesture>(['tap', 'hold', 'double_tap'])(
+    'keeps the configured card entity for the %s toggle action',
+    (gesture) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(1_000);
+      const { homeAssistant, host } = createLovelaceTree();
+      const baseConfig = config();
+      const field = gesture === 'double_tap' ? 'double_tap_action' : `${gesture}_action`;
+      const actionConfig = config({
+        behavior: { ...baseConfig.behavior, more_info_entity: 'sensor.battery_details' },
+        [field]: { action: 'toggle' },
+      });
+      const listener = vi.fn();
+      homeAssistant.addEventListener('hass-action', listener);
+
+      activate(
+        new ActionController(
+          () => host,
+          () => actionConfig,
+        ),
+        gesture,
+      );
+
+      expect(listener).toHaveBeenCalledOnce();
+      const event = listener.mock.calls[0]![0] as CustomEvent;
+      expect(event.detail.config.entity).toBe('sensor.battery');
+      expect(event.detail.config[field]).toEqual({ action: 'toggle' });
+    },
+  );
+
   it('shows a Home Assistant notification and warns for unknown action types', () => {
     const { homeAssistant, host } = createLovelaceTree();
     const actionConfig = config({ tap_action: { action: 'launch-rocket' } });

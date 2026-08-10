@@ -109,9 +109,16 @@ export class ActionController {
       this.warn(target, message, actionConfig);
       return;
     }
+    const eventConfig =
+      actionType === 'more-info' && config.behavior.more_info_entity && !actionConfig.entity
+        ? {
+            ...config,
+            [field]: { ...actionConfig, entity: config.behavior.more_info_entity },
+          }
+        : config;
     target.dispatchEvent(
       new CustomEvent('hass-action', {
-        detail: { config, action },
+        detail: { config: eventConfig, action },
         bubbles: true,
         composed: true,
       }),
