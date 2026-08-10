@@ -194,6 +194,67 @@ describe('configuration validation', () => {
   });
 });
 
+describe('action execution', () => {
+  it('opens more-info from a viewport overlay through the in-tree card host', async () => {
+    const homeAssistant = document.createElement('home-assistant');
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+    const received: CustomEvent[] = [];
+    homeAssistant.addEventListener('hass-more-info', (event) => {
+      received.push(event as CustomEvent);
+    });
+    homeAssistant.append(card);
+    document.body.append(homeAssistant);
+    card.hass = hass();
+    card.setConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      position: { mode: 'viewport' },
+      tap_action: { action: 'more-info' },
+    });
+    await card.updateComplete;
+
+    const overlay = document.body.querySelector<FloatingBatteryOverlay>(
+      'floating-battery-overlay[data-floating-battery-owner]',
+    );
+    await overlay!.updateComplete;
+    const surface = overlay!.shadowRoot!.querySelector<HTMLElement>('.surface');
+    surface!.dispatchEvent(new Event('pointerup', { bubbles: true, composed: true }));
+
+    expect(received).toHaveLength(1);
+    expect(received[0]!.target).toBe(card);
+    expect(received[0]!.detail).toEqual({ entityId: 'sensor.battery' });
+  });
+
+  it('honors a more-info entity override without changing the configured source entity', async () => {
+    const homeAssistant = document.createElement('home-assistant');
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+    const received: CustomEvent[] = [];
+    homeAssistant.addEventListener('hass-more-info', (event) => {
+      received.push(event as CustomEvent);
+    });
+    homeAssistant.append(card);
+    document.body.append(homeAssistant);
+    card.hass = hass();
+    card.setConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      behavior: { more_info_entity: 'sensor.battery_details' },
+      tap_action: { action: 'more-info' },
+    });
+    await card.updateComplete;
+
+    const overlay = document.body.querySelector<FloatingBatteryOverlay>(
+      'floating-battery-overlay[data-floating-battery-owner]',
+    );
+    await overlay!.updateComplete;
+    overlay!.shadowRoot!.querySelector<HTMLElement>('.surface')!.dispatchEvent(
+      new Event('pointerup', { bubbles: true, composed: true }),
+    );
+
+    expect(received[0]!.detail).toEqual({ entityId: 'sensor.battery_details' });
+  });
+});
+
 describe('Home Assistant grid sizing', () => {
   it('uses the hidden-card contract for viewport mode without disconnecting', async () => {
     const { card, overlay } = await createCard('viewport', 0);

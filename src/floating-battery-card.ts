@@ -1,6 +1,6 @@
 import { LitElement, css, html, nothing, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { HomeAssistant } from 'custom-card-helpers';
+import { handleAction, type HomeAssistant } from 'custom-card-helpers';
 
 import { CARD_VERSION } from './defaults';
 import './floating-battery-overlay';
@@ -93,6 +93,7 @@ export class FloatingBatteryCard extends LitElement {
     window.addEventListener('hashchange', this.onLocationChanged);
     window.addEventListener('location-changed', this.onLocationChanged as EventListener);
     document.addEventListener('location-changed', this.onLocationChanged as EventListener);
+    this.addEventListener('hass-action', this.onHassAction as EventListener);
     queueMicrotask(() => {
       this.syncHostVisibility();
       this.syncPresentationMode();
@@ -105,6 +106,7 @@ export class FloatingBatteryCard extends LitElement {
     window.removeEventListener('hashchange', this.onLocationChanged);
     window.removeEventListener('location-changed', this.onLocationChanged as EventListener);
     document.removeEventListener('location-changed', this.onLocationChanged as EventListener);
+    this.removeEventListener('hass-action', this.onHassAction as EventListener);
     this.removeOverlay();
     super.disconnectedCallback();
   }
@@ -192,6 +194,47 @@ export class FloatingBatteryCard extends LitElement {
     if (this.overlay) {
       this.overlay.active = window.location.pathname === this.sourcePath;
     }
+  };
+
+  private readonly onHassAction = (event: CustomEvent): void => {
+    if (!this._hass) return;
+    const action = event.detail?.action;
+    const config = event.detail?.config as NormalizedFloatingBatteryCardConfig | undefined;
+    if (!config || !['tap', 'hold', 'double_tap'].includes(action)) return;
+
+    event.stopPropagation();
+    const field = action === 'double_tap' ? 'double_tap_action' : `${action}_action`;
+    const actionConfig = config[field];
+    let executionConfig = config;
+
+    if (actionConfig.action === 'more-info') {
+      executionConfig = {
+        ...config,
+        entity: actionConfig.entity || config.behavior.more_info_entity || config.entity,
+      };
+    } else if (actionConfig.action === 'perform-action') {
+      executionConfig = {
+        ...config,
+        [field]: {
+          ...actionConfig,
+          action: 'call-service',
+          service: actionConfig.perform_action,
+          service_data: actionConfig.data ?? actionConfig.service_data,
+        },
+      };
+    } else if (actionConfig.action === 'call-service' && actionConfig.data) {
+      executionConfig = {
+        ...config,
+        [field]: { ...actionConfig, service_data: actionConfig.data },
+      };
+    }
+
+    handleAction(
+      this,
+      this._hass,
+      executionConfig as unknown as Parameters<typeof handleAction>[2],
+      action,
+    );
   };
 
   private readonly instanceId = `fbc-${Math.random().toString(36).slice(2, 10)}`;
