@@ -41,12 +41,14 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "7.1.2",
     "custom-card-helpers": "2.0.0",
     "lit": "^3.3.3",
     "home-assistant-js-websocket": "9.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@rollup/plugin-commonjs": "29.0.3",
     "@rollup/plugin-node-resolve": "^15.2.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.0",

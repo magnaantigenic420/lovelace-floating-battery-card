@@ -1,3 +1,4 @@
+import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
@@ -14,6 +15,7 @@ export default {
   },
   plugins: [
     resolve({ browser: true }),
+    commonjs(),
     typescript({ tsconfig: './tsconfig.json' }),
     production && terser({ ecma: 2022, format: { comments: false } }),
   ].filter(Boolean),

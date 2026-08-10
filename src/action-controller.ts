@@ -1,4 +1,5 @@
-import type { NormalizedFloatingBatteryCardConfig } from './types';
+import { sanitizeUrl } from '@braintree/sanitize-url';
+import type { ActionConfig, NormalizedFloatingBatteryCardConfig } from './types';
 
 const SUPPORTED_ACTIONS = new Set([
   'none',
@@ -99,19 +100,29 @@ export class ActionController {
     const actionType = actionConfig?.action;
     if (typeof actionType !== 'string' || !SUPPORTED_ACTIONS.has(actionType)) {
       const message = `Floating Battery Card: unsupported action type "${String(actionType)}" in ${field}.`;
-      console.warn(message, actionConfig);
-      target.dispatchEvent(
-        new CustomEvent('hass-notification', {
-          detail: { message },
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      this.warn(target, message, actionConfig);
+      return;
+    }
+    const url = actionConfig.url_path;
+    if (actionType === 'url' && url && (typeof url !== 'string' || sanitizeUrl(url) !== url)) {
+      const message = `Floating Battery Card: blocked an unsafe URL in ${field}.`;
+      this.warn(target, message, actionConfig);
       return;
     }
     target.dispatchEvent(
       new CustomEvent('hass-action', {
         detail: { config, action },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  private warn(target: HTMLElement, message: string, actionConfig?: ActionConfig): void {
+    console.warn(message, actionConfig);
+    target.dispatchEvent(
+      new CustomEvent('hass-notification', {
+        detail: { message },
         bubbles: true,
         composed: true,
       }),

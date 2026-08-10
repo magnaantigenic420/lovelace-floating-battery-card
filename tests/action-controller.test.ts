@@ -156,4 +156,56 @@ describe('ActionController', () => {
     expect((notificationListener.mock.calls[0]![0] as CustomEvent).detail).toEqual({ message });
     expect(warn).toHaveBeenCalledWith(message, { action: 'launch-rocket' });
   });
+
+  it.each([
+    'http://example.com/battery',
+    'https://example.com/battery?device=phone#level',
+    '/lovelace/batteries',
+    '#battery-details',
+  ])('delegates the accepted URL %s without opening it locally', (url) => {
+    const { homeAssistant, host } = createLovelaceTree();
+    const actionConfig = config({ tap_action: { action: 'url', url_path: url } });
+    const actionListener = vi.fn();
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    homeAssistant.addEventListener('hass-action', actionListener);
+
+    new ActionController(
+      () => host,
+      () => actionConfig,
+    ).pointerUp();
+
+    expect(actionListener).toHaveBeenCalledOnce();
+    const event = actionListener.mock.calls[0]![0] as CustomEvent;
+    expect(event.target).toBe(host);
+    expect(event.detail.config.tap_action).toEqual({ action: 'url', url_path: url });
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'javascript:alert(1)',
+    '  JaVaScRiPt:alert(1)',
+    'data:text/html,<script>alert(1)</script>',
+    'vbscript:msgbox(1)',
+  ])('blocks the dangerous URL %s with useful feedback', (url) => {
+    const { homeAssistant, host } = createLovelaceTree();
+    const actionConfig = config({ tap_action: { action: 'url', url_path: url } });
+    const actionListener = vi.fn();
+    const notificationListener = vi.fn();
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    homeAssistant.addEventListener('hass-action', actionListener);
+    homeAssistant.addEventListener('hass-notification', notificationListener);
+
+    new ActionController(
+      () => host,
+      () => actionConfig,
+    ).pointerUp();
+
+    const message = 'Floating Battery Card: blocked an unsafe URL in tap_action.';
+    expect(actionListener).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    expect(notificationListener).toHaveBeenCalledOnce();
+    expect((notificationListener.mock.calls[0]![0] as CustomEvent).detail).toEqual({ message });
+    expect(warn).toHaveBeenCalledWith(message, actionConfig.tap_action);
+  });
 });
