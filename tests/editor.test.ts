@@ -37,10 +37,11 @@ function editTextField(
   editor: FloatingBatteryCardEditor,
   label: string,
   value: string,
+  index = 0,
 ): FloatingBatteryCardConfig {
-  const field = [...editor.shadowRoot!.querySelectorAll('ha-textfield')].find(
+  const field = [...editor.shadowRoot!.querySelectorAll('ha-textfield')].filter(
     (candidate) => (candidate as HTMLElement & { label?: string }).label === label,
-  ) as (HTMLElement & { value: string }) | undefined;
+  )[index] as (HTMLElement & { value: string }) | undefined;
   expect(field).toBeDefined();
 
   let changed: FloatingBatteryCardConfig | undefined;
@@ -53,6 +54,36 @@ function editTextField(
   );
   field!.value = value;
   field!.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+  expect(changed).toBeDefined();
+  return changed!;
+}
+
+function editSelector(
+  editor: FloatingBatteryCardEditor,
+  label: string,
+  value: unknown,
+  index = 0,
+): FloatingBatteryCardConfig {
+  const selector = [...editor.shadowRoot!.querySelectorAll('ha-selector')].filter(
+    (candidate) => (candidate as HTMLElement & { label?: string }).label === label,
+  )[index] as HTMLElement | undefined;
+  expect(selector).toBeDefined();
+
+  let changed: FloatingBatteryCardConfig | undefined;
+  editor.addEventListener(
+    'config-changed',
+    (event) => {
+      changed = (event as CustomEvent<{ config: FloatingBatteryCardConfig }>).detail.config;
+    },
+    { once: true },
+  );
+  selector!.dispatchEvent(
+    new CustomEvent('value-changed', {
+      detail: { value },
+      bubbles: true,
+      composed: true,
+    }),
+  );
   expect(changed).toBeDefined();
   return changed!;
 }
@@ -158,4 +189,46 @@ describe('dimension editor', () => {
     expect(changed.position?.offset_x).toBe(20);
     expect(styles.right).toBe('calc(20px + 0px + env(safe-area-inset-right, 0px))');
   });
+});
+
+describe('threshold editor defaults', () => {
+  it.each([
+    { name: 'color', property: 'color', label: 'Color', value: '#123456', selector: false },
+    { name: 'min', property: 'min', label: 'Min', value: '21', selector: false },
+    { name: 'max', property: 'max', label: 'Max', value: '55', selector: false },
+    {
+      name: 'icon',
+      property: 'icon',
+      label: 'Icon override',
+      value: 'mdi:battery-50',
+      selector: true,
+    },
+    {
+      name: 'animation',
+      property: 'animation',
+      label: 'Animation',
+      value: 'pulse',
+      selector: true,
+    },
+  ] as const)(
+    'materializes all default rows before editing $name',
+    async ({ property, label, value, selector }) => {
+      const editor = createEditor();
+      await editor.updateComplete;
+
+      const changed = selector
+        ? editSelector(editor, label, value, 1)
+        : editTextField(editor, label, value, 1);
+      const expected = property === 'min' || property === 'max' ? Number(value) : value;
+
+      expect(changed.thresholds).toHaveLength(3);
+      expect(changed.thresholds!.every((threshold) => threshold !== undefined)).toBe(true);
+      expect(changed.thresholds!.map((threshold) => threshold.max)).toEqual(
+        property === 'max' ? [20, 55, 100] : [20, 50, 100],
+      );
+      expect(changed.thresholds![1]![property]).toBe(expected);
+      expect(changed.thresholds![0]).toMatchObject({ max: 20 });
+      expect(changed.thresholds![2]).toMatchObject({ max: 100 });
+    },
+  );
 });
