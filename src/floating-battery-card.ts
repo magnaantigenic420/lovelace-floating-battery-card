@@ -15,6 +15,7 @@ import { isEditorContext } from './utils';
 @customElement('floating-battery-card')
 export class FloatingBatteryCard extends LitElement {
   @property({ type: Boolean }) public preview = false;
+  public readonly connectedWhileHidden = true;
 
   private config?: NormalizedFloatingBatteryCardConfig;
   private inlineConfig?: NormalizedFloatingBatteryCardConfig;
@@ -48,6 +49,7 @@ export class FloatingBatteryCard extends LitElement {
       ...this.inlineConfig,
       behavior: { ...this.inlineConfig.behavior, pointer_events: false },
     };
+    this.syncHostVisibility();
     this.syncPresentationMode();
     this.syncOverlay(true);
     this.requestUpdate();
@@ -75,6 +77,15 @@ export class FloatingBatteryCard extends LitElement {
     return this.config?.position.mode === 'inline' ? 1 : 0;
   }
 
+  public getGridOptions(): {
+    columns: number;
+    rows: number;
+    min_columns: number;
+    min_rows: number;
+  } {
+    return { columns: 3, rows: 1, min_columns: 1, min_rows: 1 };
+  }
+
   public override connectedCallback(): void {
     super.connectedCallback();
     this.sourcePath = window.location.pathname;
@@ -83,6 +94,7 @@ export class FloatingBatteryCard extends LitElement {
     window.addEventListener('location-changed', this.onLocationChanged as EventListener);
     document.addEventListener('location-changed', this.onLocationChanged as EventListener);
     queueMicrotask(() => {
+      this.syncHostVisibility();
       this.syncPresentationMode();
       this.syncOverlay(true);
     });
@@ -113,8 +125,26 @@ export class FloatingBatteryCard extends LitElement {
   }
 
   protected override updated(): void {
+    this.syncHostVisibility();
     this.syncPresentationMode();
     this.syncOverlay();
+  }
+
+  private syncHostVisibility(): void {
+    if (!this.config) return;
+    const shouldHide = this.config.position.mode === 'viewport' && !isEditorContext(this);
+    if (this.hidden === shouldHide) return;
+    this.hidden = shouldHide;
+    if (shouldHide) this.style.setProperty('display', 'none');
+    else this.style.removeProperty('display');
+    this.dispatchEvent(
+      new CustomEvent('card-visibility-changed', {
+        bubbles: true,
+        composed: true,
+        detail: { value: !shouldHide },
+      }),
+    );
+    this.requestUpdate();
   }
 
   private syncPresentationMode(): void {

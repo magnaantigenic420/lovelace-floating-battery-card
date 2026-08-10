@@ -181,3 +181,47 @@ describe('configuration validation', () => {
     ).toThrow('state_map.charging must be an array of strings.');
   });
 });
+
+describe('Home Assistant grid sizing', () => {
+  it('uses the hidden-card contract for viewport mode without disconnecting', async () => {
+    const { card, overlay } = await createCard('viewport', 0);
+
+    expect(card.hidden).toBe(true);
+    expect(card.style.display).toBe('none');
+    expect(card.connectedWhileHidden).toBe(true);
+    expect(card.getGridOptions()).toEqual({
+      columns: 3,
+      rows: 1,
+      min_columns: 1,
+      min_rows: 1,
+    });
+    expect(overlay.isConnected).toBe(true);
+  });
+
+  it('reports a compact grid footprint for inline mode', async () => {
+    const { card } = await createCard('inline', 0);
+
+    expect(card.hidden).toBe(false);
+    expect(card.getGridOptions()).toEqual({
+      columns: 3,
+      rows: 1,
+      min_columns: 1,
+      min_rows: 1,
+    });
+  });
+
+  it('makes a viewport card visible and selectable in Sections edit mode', async () => {
+    const { card } = await createCard('viewport', 0);
+    const wrapper = document.createElement('hui-card-edit-mode');
+
+    wrapper.append(card);
+    document.body.append(wrapper);
+    await Promise.resolve();
+    await card.updateComplete;
+
+    expect(card.hidden).toBe(false);
+    expect(card.style.display).toBe('');
+    expect(card.hasAttribute('inline')).toBe(true);
+    expect(card.shadowRoot!.querySelector('floating-battery-overlay')).not.toBeNull();
+  });
+});
