@@ -1,4 +1,3 @@
-import { handleAction, type HomeAssistant } from 'custom-card-helpers';
 import type { NormalizedFloatingBatteryCardConfig } from './types';
 
 export class ActionController {
@@ -8,8 +7,7 @@ export class ActionController {
   private lastTap = 0;
 
   public constructor(
-    private readonly element: HTMLElement,
-    private readonly getHass: () => HomeAssistant | undefined,
+    private readonly getActionTarget: () => HTMLElement | undefined,
     private readonly getConfig: () => NormalizedFloatingBatteryCardConfig | undefined,
   ) {}
 
@@ -81,10 +79,15 @@ export class ActionController {
   }
 
   private fire(action: 'tap' | 'hold' | 'double_tap'): void {
-    const hass = this.getHass();
     const config = this.getConfig();
-    if (!hass || !config) return;
-    const entity = config.behavior.more_info_entity || config.entity;
-    handleAction(this.element, hass, { ...config, entity }, action);
+    const target = this.getActionTarget();
+    if (!config || !target) return;
+    target.dispatchEvent(
+      new CustomEvent('hass-action', {
+        detail: { config, action },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 }

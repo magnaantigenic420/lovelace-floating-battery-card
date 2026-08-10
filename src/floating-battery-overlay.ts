@@ -35,8 +35,7 @@ export class FloatingBatteryOverlay extends LitElement {
   private lastFingerprint = '';
   private autoHideTimer?: number;
   private readonly actions = new ActionController(
-    this,
-    () => this.hass,
+    () => this.sourceHost,
     () => this.config,
   );
 
