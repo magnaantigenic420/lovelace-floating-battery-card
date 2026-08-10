@@ -11,6 +11,7 @@ import {
   selectThreshold,
 } from '../src/battery';
 import { normalizeConfig } from '../src/normalize';
+import type { FloatingBatteryCardConfig } from '../src/types';
 
 const config = normalizeConfig({
   type: 'custom:floating-battery-card',
@@ -35,6 +36,23 @@ function hassWithState(state: string): HomeAssistant {
       'sensor.battery_state': entity('sensor.battery_state', state),
     },
   } as unknown as HomeAssistant;
+}
+
+function snapshotAt(
+  level: number,
+  precision: number,
+  overrides: Partial<FloatingBatteryCardConfig> = {},
+) {
+  const snapshotConfig = normalizeConfig({
+    type: 'custom:floating-battery-card',
+    entity: 'sensor.battery',
+    precision,
+    ...overrides,
+  });
+  const hass = {
+    states: { 'sensor.battery': entity('sensor.battery', String(level)) },
+  } as unknown as HomeAssistant;
+  return getBatterySnapshot(hass, snapshotConfig);
 }
 
 describe('parseNumericState', () => {
@@ -166,5 +184,47 @@ describe('icon selection', () => {
       icons: { dynamic_level: true },
     });
     expect(selectIcon('not_charging', 53, undefined, dynamic)).toBe('mdi:battery-50');
+  });
+});
+
+describe('display precision', () => {
+  it('does not change threshold selection immediately around a boundary', () => {
+    const thresholds = [
+      { max: 50, color: 'red' },
+      { max: 100, color: 'green' },
+    ];
+
+    for (const precision of [0, 3]) {
+      expect(snapshotAt(49.999, precision, { thresholds }).threshold?.max).toBe(50);
+      expect(snapshotAt(50.001, precision, { thresholds }).threshold?.max).toBe(100);
+    }
+    expect(snapshotAt(49.999, 0, { thresholds }).displayLevel).toBe(50);
+    expect(snapshotAt(50.001, 0, { thresholds }).displayLevel).toBe(50);
+  });
+
+  it('does not change full-state detection immediately around the cutoff', () => {
+    for (const precision of [0, 3]) {
+      expect(snapshotAt(49.999, precision, { full_threshold: 50 }).semanticState).toBe('unknown');
+      expect(snapshotAt(50.001, precision, { full_threshold: 50 }).semanticState).toBe('full');
+    }
+    expect(snapshotAt(49.999, 0, { full_threshold: 50 }).displayLevel).toBe(50);
+  });
+
+  it('does not let precision change dynamic icon selection', () => {
+    const overrides = { icons: { dynamic_level: true } };
+
+    expect(snapshotAt(94.6, 0, overrides).icon).toBe('mdi:battery-90');
+    expect(snapshotAt(94.6, 2, overrides).icon).toBe('mdi:battery-90');
+  });
+
+  it('still rounds display values and text to the requested precision', () => {
+    const whole = snapshotAt(50.456, 0);
+    const decimals = snapshotAt(50.456, 2);
+
+    expect(whole.displayLevel).toBe(50);
+    expect(whole.levelText).toBe('50');
+    expect(decimals.displayLevel).toBe(50.46);
+    expect(decimals.levelText).toBe('50.46');
+    expect(decimals.normalizedLevel).toBeCloseTo(50.456);
   });
 });

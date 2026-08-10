@@ -245,8 +245,8 @@ export class FloatingBatteryOverlay extends LitElement {
       classes.push(`charging-${this.config.animation.charging}`);
     }
     if (
-      snapshot.displayLevel !== undefined &&
-      snapshot.displayLevel <= this.config.animation.low_battery_threshold &&
+      snapshot.normalizedLevel !== undefined &&
+      snapshot.normalizedLevel <= this.config.animation.low_battery_threshold &&
       this.config.animation.low_battery !== 'none'
     ) {
       classes.push(`low-${this.config.animation.low_battery}`);

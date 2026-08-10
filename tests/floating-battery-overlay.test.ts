@@ -48,6 +48,29 @@ async function renderOverlay(
   return overlay;
 }
 
+async function renderLevelOverlay(
+  level: number,
+  precision: number,
+): Promise<FloatingBatteryOverlay> {
+  const host = document.createElement('floating-battery-card');
+  const overlay = document.createElement('floating-battery-overlay');
+  overlay.hass = {
+    states: { 'sensor.battery': entity('sensor.battery', String(level)) },
+  } as unknown as HomeAssistant;
+  overlay.sourceHost = host;
+  overlay.setConfig(
+    normalizeConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      precision,
+      animation: { low_battery: 'pulse', low_battery_threshold: 15 },
+    }),
+  );
+  document.body.append(host, overlay);
+  await overlay.updateComplete;
+  return overlay;
+}
+
 afterEach(() => {
   document.body.replaceChildren();
 });
@@ -72,5 +95,19 @@ describe('unavailable visibility', () => {
     const overlay = await renderOverlay('hide', 'idle');
 
     expect(overlay.shadowRoot!.querySelector('.surface')).not.toBeNull();
+  });
+});
+
+describe('precision-independent animations', () => {
+  it.each([
+    [14.6, true],
+    [15.4, false],
+  ] as const)('uses the normalized level %s at the low-battery boundary', async (level, low) => {
+    for (const precision of [0, 2]) {
+      const overlay = await renderLevelOverlay(level, precision);
+      const surface = overlay.shadowRoot!.querySelector('.surface');
+
+      expect(surface!.classList.contains('low-pulse')).toBe(low);
+    }
   });
 });

@@ -124,10 +124,10 @@ export function getBatterySnapshot(
     !config.state_entity ||
     (stateEntity !== undefined && !['unavailable'].includes(stateEntity.state.toLowerCase()));
   const sourcesAvailable = rawLevel !== undefined && levelEntityAvailable && stateEntityAvailable;
-  const semanticState = sourcesAvailable ? mapSemanticState(stateValue, rounded, config) : 'unavailable';
+  const semanticState = sourcesAvailable ? mapSemanticState(stateValue, normalized, config) : 'unavailable';
   const available = sourcesAvailable && semanticState !== 'unavailable';
-  const threshold = selectThreshold(rounded, config.thresholds);
-  const icon = selectIcon(semanticState, rounded, threshold, config);
+  const threshold = selectThreshold(normalized, config.thresholds);
+  const icon = selectIcon(semanticState, normalized, threshold, config);
 
   const friendlyName = levelEntity?.attributes?.friendly_name;
   const name = config.display.name || (typeof friendlyName === 'string' ? friendlyName : config.entity);
