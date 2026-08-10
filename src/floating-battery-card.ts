@@ -1,5 +1,5 @@
 import { LitElement, css, html, nothing, type TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import type { HomeAssistant } from 'custom-card-helpers';
 
 import { CARD_VERSION } from './defaults';
@@ -14,8 +14,11 @@ import { isEditorContext } from './utils';
 
 @customElement('floating-battery-card')
 export class FloatingBatteryCard extends LitElement {
+  @property({ type: Boolean }) public preview = false;
+
   private config?: NormalizedFloatingBatteryCardConfig;
   private inlineConfig?: NormalizedFloatingBatteryCardConfig;
+  private previewConfig?: NormalizedFloatingBatteryCardConfig;
   private _hass?: HomeAssistant;
   private overlay?: FloatingBatteryOverlay;
   private sourcePath = window.location.pathname;
@@ -40,6 +43,10 @@ export class FloatingBatteryCard extends LitElement {
     this.inlineConfig = {
       ...this.config,
       position: { ...this.config.position, mode: 'inline' },
+    };
+    this.previewConfig = {
+      ...this.inlineConfig,
+      behavior: { ...this.inlineConfig.behavior, pointer_events: false },
     };
     this.syncPresentationMode();
     this.syncOverlay(true);
@@ -92,15 +99,22 @@ export class FloatingBatteryCard extends LitElement {
 
   protected override render(): TemplateResult | typeof nothing {
     if (!this.config) return nothing;
-    const inline = this.config.position.mode === 'inline' || isEditorContext(this);
+    const editorContext = isEditorContext(this);
+    const inline = this.config.position.mode === 'inline' || editorContext;
     if (!inline) return nothing;
 
     return html`<floating-battery-overlay
       .hass=${this._hass}
       .active=${true}
       .sourceHost=${this}
-      .config=${this.inlineConfig}
+      .config=${editorContext ? this.previewConfig : this.inlineConfig}
+      ?inert=${editorContext}
     ></floating-battery-overlay>`;
+  }
+
+  protected override updated(): void {
+    this.syncPresentationMode();
+    this.syncOverlay();
   }
 
   private syncPresentationMode(): void {

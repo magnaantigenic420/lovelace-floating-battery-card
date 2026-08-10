@@ -100,11 +100,18 @@ export function resolveColors(
 
 export function isEditorContext(element: HTMLElement): boolean {
   let current: Node | null = element;
-  const editorTags = ['hui-card-preview', 'hui-dialog-edit-card', 'hui-card-element-editor'];
+  const editorTags = new Set([
+    'hui-card-options',
+    'hui-card-edit-mode',
+    'hui-card-preview',
+    'hui-dialog-edit-card',
+    'hui-card-element-editor',
+  ]);
   for (let i = 0; current && i < 30; i += 1) {
     if (current instanceof HTMLElement) {
       const tag = current.tagName.toLowerCase();
-      if (editorTags.some((candidate) => tag.includes(candidate))) return true;
+      if (editorTags.has(tag)) return true;
+      if ((current as HTMLElement & { preview?: boolean }).preview === true) return true;
       if (current.classList.contains('card-preview')) return true;
     }
     if (current.parentNode) {

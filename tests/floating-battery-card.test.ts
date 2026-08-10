@@ -107,3 +107,63 @@ describe('inline Home Assistant updates', () => {
     expect(overlay.shadowRoot!.querySelector('.surface')).toBeNull();
   });
 });
+
+describe('Home Assistant editor contexts', () => {
+  it.each([
+    'hui-card-options',
+    'hui-card-edit-mode',
+    'hui-card-preview',
+    'hui-dialog-edit-card',
+    'hui-card-element-editor',
+  ])('renders viewport configuration inline and inert inside %s', async (tagName) => {
+    const wrapper = document.createElement(tagName);
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+    wrapper.append(card);
+    document.body.append(wrapper);
+    card.hass = hass();
+    card.setConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      position: { mode: 'viewport' },
+    });
+    await card.updateComplete;
+
+    const inlineOverlay = card.shadowRoot!.querySelector<FloatingBatteryOverlay>('floating-battery-overlay');
+    expect(card.hasAttribute('inline')).toBe(true);
+    expect(inlineOverlay).not.toBeNull();
+    expect(inlineOverlay!.hasAttribute('inert')).toBe(true);
+    expect(inlineOverlay!.config!.behavior.pointer_events).toBe(false);
+    expect(document.body.querySelector('floating-battery-overlay[data-floating-battery-owner]')).toBeNull();
+  });
+
+  it('reacts to the Home Assistant card preview property', async () => {
+    const { card, overlay } = await createCard('viewport', 0);
+
+    card.preview = true;
+    await card.updateComplete;
+
+    const inlineOverlay = card.shadowRoot!.querySelector<FloatingBatteryOverlay>('floating-battery-overlay');
+    expect(overlay.isConnected).toBe(false);
+    expect(inlineOverlay).not.toBeNull();
+    expect(inlineOverlay!.hasAttribute('inert')).toBe(true);
+    expect(inlineOverlay!.config!.behavior.pointer_events).toBe(false);
+  });
+
+  it('keeps legacy card-preview class detection', async () => {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('card-preview');
+    const card = document.createElement('floating-battery-card') as FloatingBatteryCard;
+    wrapper.append(card);
+    document.body.append(wrapper);
+    card.hass = hass();
+    card.setConfig({
+      type: 'custom:floating-battery-card',
+      entity: 'sensor.battery',
+      position: { mode: 'viewport' },
+    });
+    await card.updateComplete;
+
+    expect(card.shadowRoot!.querySelector('floating-battery-overlay')).not.toBeNull();
+    expect(document.body.querySelector('floating-battery-overlay[data-floating-battery-owner]')).toBeNull();
+  });
+});
